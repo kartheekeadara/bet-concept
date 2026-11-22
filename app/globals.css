@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+/* anchor targets land below the sticky header (+ menu tabs) */
+:target,
+section[id] {
+  scroll-margin-top: 84px;
+}
+body {
+  overflow-x: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[tabindex="-1"]:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 3px solid #c8336e;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full px-6 text-[16px] font-bold transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-pink text-white hover:bg-pink-deep;
+  }
+  .btn-ghost {
+    @apply btn border-2 border-cocoa text-cocoa hover:bg-cocoa hover:text-cream;
+  }
+  .btn-ghost-light {
+    @apply btn border-2 border-cream text-cream hover:bg-cream hover:text-cocoa;
+  }
+  .field {
+    @apply block min-h-[48px] w-full rounded-xl border-2 border-cream-line bg-white px-4 py-3 text-[16px] text-cocoa placeholder:text-cocoa-soft/70 focus:border-cocoa focus:outline-none;
+  }
+  .field[aria-invalid="true"] {
+    @apply border-pink;
+  }
+  .label {
+    @apply mb-1.5 block text-[15px] font-bold text-cocoa;
+  }
+  .err {
+    @apply mt-1.5 text-[14px] font-semibold text-pink-deep;
+  }
+  .h2 {
+    @apply font-display text-[34px] font-semibold leading-[1.05] tracking-[-0.01em] sm:text-[44px];
+  }
+}

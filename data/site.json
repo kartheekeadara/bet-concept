@@ -1,0 +1,96 @@
+{
+  "_comment": "Business data in one place. Everything marked sample:true is SAMPLE data for the concept — confirm with Marcia.",
+  "name": "Brazilian Eats & Treats",
+  "owner": "Marcia Sanabria",
+  "siteUrl": "https://kartheekeadara.github.io/bet-concept",
+  "address": {
+    "street": "16049 Johnston Rd Ste K",
+    "city": "Charlotte",
+    "region": "NC",
+    "postal": "28277",
+    "neighborhood": "Ballantyne",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Brazilian+Eats+%26+Treats+16049+Johnston+Rd+Ste+K+Charlotte+NC+28277",
+    "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=16049+Johnston+Rd+Ste+K+Charlotte+NC+28277"
+  },
+  "phone": { "display": "(980) 406-3654", "tel": "+19804063654", "sms": "+19804063654" },
+  "email": "BrazilianEatsAndTreats@gmail.com",
+  "instagram": { "handle": "@brazilian_eatstreats", "url": "https://www.instagram.com/brazilian_eatstreats/" },
+  "facebook": { "url": "https://www.facebook.com/", "placeholder": true },
+  "uberEatsUrl": "https://www.ubereats.com/search?q=Brazilian%20Eats%20%26%20Treats%20Charlotte",
+  "timezone": "America/New_York",
+
+  "hours": {
+    "sample": true,
+    "_days": "0 = Sunday … 6 = Saturday; null = closed; 24h times",
+    "days": [
+      { "open": "12:00", "close": "15:00" },
+      null,
+      { "open": "08:00", "close": "19:00" },
+      { "open": "08:00", "close": "19:00" },
+      { "open": "08:00", "close": "19:00" },
+      { "open": "08:00", "close": "19:00" },
+      { "open": "08:00", "close": "19:00" }
+    ]
+  },
+
+  "feijoada": {
+    "sample": true,
+    "nextDate": { "en": "Sat, Dec 13", "pt": "sáb., 13 de dez." }
+  },
+
+  "cakes": {
+    "sample": true,
+    "deposit": 25,
+    "leadDays": { "standard": 5, "tiered": 14 },
+    "sizes": [
+      { "id": "6in", "label": "6\"", "serves": "8–10", "from": 45, "tiers": 1 },
+      { "id": "8in", "label": "8\"", "serves": "15–20", "from": 65, "tiers": 1 },
+      { "id": "10in", "label": "10\"", "serves": "25–30", "from": 90, "tiers": 1 },
+      { "id": "tiered", "label": "Tiered", "serves": "50+", "from": null, "tiers": 3 }
+    ],
+    "flavors": [
+      { "id": "brigadeiro", "pt": "Brigadeiro", "en": "Chocolate fudge", "color": "#5A3324" },
+      { "id": "beijinho", "pt": "Beijinho", "en": "Coconut", "color": "#F5EEE2" },
+      { "id": "doce-de-leite", "pt": "Doce de Leite", "en": "Milk caramel", "color": "#C98B4E" },
+      { "id": "prestigio", "pt": "Prestígio", "en": "Chocolate & coconut", "color": "#4A2A1E" },
+      { "id": "ninho", "pt": "Ninho", "en": "Milk", "color": "#FFF7E6" },
+      { "id": "red-velvet", "pt": "Red Velvet", "en": "Red velvet", "color": "#9E2A36" }
+    ],
+    "fillings": [
+      { "id": "brigadeiro", "pt": "Brigadeiro", "en": "Chocolate fudge" },
+      { "id": "ninho", "pt": "Ninho", "en": "Milk cream" },
+      { "id": "morango", "pt": "Morango", "en": "Strawberry" },
+      { "id": "maracuja", "pt": "Mousse de Maracujá", "en": "Passion fruit mousse" },
+      { "id": "doce-de-leite", "pt": "Doce de Leite", "en": "Milk caramel" },
+      { "id": "coco", "pt": "Coco", "en": "Coconut" }
+    ]
+  },
+
+  "catering": {
+    "sample": true,
+    "trays": [
+      { "id": "s25", "pieces": 25, "from": 35 },
+      { "id": "s50", "pieces": 50, "from": 65 },
+      { "id": "s100", "pieces": 100, "from": 120 }
+    ]
+  },
+
+  "photos": {
+    "hero": { "file": "hero.jpg", "need": "Salgados spread or signature cake (hero, wide)" },
+    "coxinha": { "file": "coxinha.jpg", "need": "Coxinha close-up" },
+    "pao-de-queijo": { "file": "pao-de-queijo.jpg", "need": "Pão de queijo basket" },
+    "pastel": { "file": "pastel.jpg", "need": "Pastel, cut open" },
+    "brigadeiro": { "file": "brigadeiro.jpg", "need": "Brigadeiros on a tray" },
+    "cake-1": { "file": "cake-1.jpg", "need": "Birthday cake" },
+    "cake-2": { "file": "cake-2.jpg", "need": "Wedding cake" },
+    "cake-3": { "file": "cake-3.jpg", "need": "Brigadeiro cake" },
+    "cake-4": { "file": "cake-4.jpg", "need": "Fruit cake (strawberries)" },
+    "cake-5": { "file": "cake-5.jpg", "need": "Kids' birthday cake" },
+    "cake-6": { "file": "cake-6.jpg", "need": "Baby shower cake" },
+    "cake-7": { "file": "cake-7.jpg", "need": "Tiered cake" },
+    "cake-8": { "file": "cake-8.jpg", "need": "Bolo de pote cups" },
+    "cake-9": { "file": "cake-9.jpg", "need": "Cake slice, cross-section" },
+    "marcia": { "file": "marcia.jpg", "need": "Photo of Marcia (with permission)" },
+    "storefront": { "file": "storefront.jpg", "need": "Storefront on Johnston Rd" }
+  }
+}
