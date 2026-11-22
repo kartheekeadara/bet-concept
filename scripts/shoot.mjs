@@ -38,8 +38,10 @@ async function open(path, w, lang) {
 }
 
 async function checkOverflow(page, label) {
-  const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth }));
-  if (o.sw > o.iw) problems.push(`${label}: horizontal scroll (${o.sw} > ${o.iw})`);
+  // compare against the configured viewport width: under mobile emulation innerWidth grows with overflowing content
+  const vw = page.viewport().width;
+  const sw = await page.evaluate(() => document.documentElement.scrollWidth);
+  if (sw > vw) problems.push(`${label}: horizontal scroll (${sw} > ${vw})`);
 }
 
 async function clickText(page, text) {

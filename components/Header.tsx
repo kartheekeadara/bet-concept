@@ -1,20 +1,27 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import site from "@/data/site.json";
 import { useApp } from "@/lib/lang";
 import { asset } from "@/lib/asset";
-import { Icon, LangToggle, OpenChip } from "@/components/ui";
+import { Icon, LangToggle } from "@/components/ui";
 
-export function Logo({ dark = false, className = "" }: { dark?: boolean; className?: string }) {
+export function Logo({ dark = false, compact = false, className = "" }: { dark?: boolean; compact?: boolean; className?: string }) {
   const { photos } = useApp();
   const src = asset(photos.logo ?? "/photos/real/logo.png");
   return (
     <Link href="/" className={`inline-flex min-h-[44px] items-center ${className}`}>
       {dark ? (
         // brown logo on a cream disc so it reads on dark sections
-        <span className="inline-flex rounded-full bg-cream p-1.5">
-          <img src={src} alt="Brazilian Eats & Treats" width={72} height={72} className="h-[72px] w-[72px]" />
+        <span className={`inline-flex rounded-full bg-cream ${compact ? "p-0.5" : "p-1.5"}`}>
+          <img
+            src={src}
+            alt="Brazilian Eats & Treats"
+            width={compact ? 44 : 72}
+            height={compact ? 44 : 72}
+            className={compact ? "h-11 w-11" : "h-[72px] w-[72px]"}
+          />
         </span>
       ) : (
         <img src={src} alt="Brazilian Eats & Treats" width={44} height={44} className="h-11 w-11" />
@@ -61,7 +68,6 @@ export function Header() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <OpenChip className="hidden xl:inline-flex" />
           <LangToggle />
           <Link href="/order-cake" className="btn-primary hidden min-h-[44px] px-5 lg:inline-flex">
             {t("cta.orderCake")}
@@ -79,10 +85,11 @@ export function Header() {
         </div>
       </div>
 
-      {open && (
-        <div id="mobile-nav" role="dialog" aria-modal="true" aria-label={t("a11y.openMenu")} className="fixed inset-0 z-50 bg-cocoa text-cream lg:hidden">
+      {open &&
+        createPortal(
+        <div id="mobile-nav" role="dialog" aria-modal="true" aria-label={t("a11y.openMenu")} className="fixed inset-0 z-50 overflow-y-auto bg-cocoa pb-10 text-cream lg:hidden">
           <div className="flex h-[68px] items-center justify-between px-4">
-            <Logo dark />
+            <Logo dark compact />
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -108,18 +115,18 @@ export function Header() {
               ))}
             </ul>
             <div className="mt-8 flex flex-col gap-3">
-              <OpenChip dark className="self-start" />
               <Link href="/order-cake" onClick={() => setOpen(false)} className="btn-primary">
                 {t("cta.orderCake")}
               </Link>
               <a href={`tel:${site.phone.tel}`} className="btn-ghost-light">
                 <Icon name="phone" /> {site.phone.display}
               </a>
-              <LangToggle dark className="self-start" />
+              <LangToggle dark inline />
             </div>
           </nav>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </header>
   );
 }

@@ -7,7 +7,7 @@ import { useApp } from "@/lib/lang";
 import { asset } from "@/lib/asset";
 import { HOURS, fmtTime, nowInBakeryTz } from "@/lib/hours";
 import type { Key } from "@/data/i18n";
-import { Eyebrow, Icon, OpenChip, Photo, SampleTag, price } from "@/components/ui";
+import { Eyebrow, Icon, Photo, price } from "@/components/ui";
 import { Logo } from "@/components/Header";
 
 export const digits = (s: string) => s.replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
@@ -40,55 +40,9 @@ export function Hero() {
         </h1>
         <p className="mt-4 max-w-xl font-display text-[22px] italic leading-snug text-cream sm:text-[28px]">{t("hero.sub")}</p>
         <p className="mt-3 max-w-lg text-[17px] leading-relaxed text-cream/90">{t("hero.body")}</p>
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <Link href="/order-cake" className="btn-primary">
-            {t("cta.orderCake")}
-          </Link>
-          <Link href="#menu" className="btn-ghost-light">
-            {t("cta.seeMenu")}
-          </Link>
-        </div>
       </div>
 
-      {/* Savor-style floating preorder card, desktop only (mobile has the sticky bottom bar) */}
-      <Link
-        href="/order-cake"
-        className="group absolute bottom-8 right-6 hidden w-[300px] items-center gap-3 rounded-2xl bg-cream p-2.5 pr-4 text-cocoa shadow-[0_18px_50px_-12px_rgba(0,0,0,0.5)] transition-transform hover:-translate-y-0.5 lg:flex xl:right-[max(1.5rem,calc((100vw-1200px)/2))]"
-      >
-        <Photo id="cake-1" alt={t("hero.card.alt")} className="h-[84px] w-[84px] shrink-0 rounded-xl text-[0px]" />
-        <span>
-          <span className="block font-display text-[19px] font-semibold leading-tight">{t("hero.card.title")}</span>
-          <span className="mt-1 block text-[15px] font-bold text-pink group-hover:underline">{t("hero.card.cta")}</span>
-        </span>
-      </Link>
     </section>
-  );
-}
-
-/* ───────────────────────── TODAY STRIP ───────────────────────── */
-export function focusFeijoada() {
-  window.setTimeout(() => document.getElementById("feijoada-phone")?.focus({ preventScroll: true }), 450);
-}
-
-export function TodayStrip() {
-  const { t, lang } = useApp();
-  return (
-    <div className="border-b border-cream-line bg-pink-wash">
-      <div className="mx-auto flex max-w-page flex-col gap-1 px-4 py-2.5 text-[15px] font-semibold sm:flex-row sm:items-center sm:justify-center sm:gap-6 sm:px-6">
-        <span className="flex min-h-[32px] items-center gap-2">
-          <Icon name="clock" className="h-4 w-4 text-pink" /> {t("today.lunch")}
-        </span>
-        <span aria-hidden className="hidden text-cocoa-soft sm:inline">
-          ·
-        </span>
-        <span className="flex flex-wrap items-center gap-x-2">
-          <span>{t("today.feijoada", { date: site.feijoada.nextDate[lang] })}</span>
-          <a href="#feijoada" onClick={focusFeijoada} className="inline-flex min-h-[44px] items-center font-extrabold text-pink-deep underline underline-offset-4">
-            {t("today.textMe")} →
-          </a>
-        </span>
-      </div>
-    </div>
   );
 }
 
@@ -103,36 +57,58 @@ const MUST = [
 export function MustTry() {
   const { t } = useApp();
   return (
-    <section aria-labelledby="must-title" className="mx-auto max-w-page px-4 py-16 sm:px-6 sm:py-24">
-      <Eyebrow>{t("must.eyebrow")}</Eyebrow>
-      <h2 id="must-title" className="h2">
-        {t("must.title")}
-      </h2>
-      <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-        {MUST.map((m) => {
+    <section aria-labelledby="must-title" className="py-16 sm:py-24">
+      <div className="mx-auto flex max-w-page items-end justify-between gap-6 px-4 sm:px-6">
+        <div>
+          <Eyebrow>{t("must.eyebrow")}</Eyebrow>
+          <h2 id="must-title" className="h2">
+            {t("must.title")}
+          </h2>
+          <p className="mt-3 max-w-md text-[17px] text-cocoa-soft">{t("must.intro")}</p>
+        </div>
+        <Link href="#menu" className="hidden shrink-0 items-center gap-2 text-[16px] font-extrabold underline decoration-pink decoration-2 underline-offset-[6px] hover:text-pink-deep sm:inline-flex">
+          {t("must.fullMenu")} <Icon name="arrow" className="h-4 w-4" />
+        </Link>
+      </div>
+
+      {/* phones: swipeable row (snaps, peeks the next card); desktop: 4-up grid */}
+      <ol className="no-scrollbar mx-auto mt-8 flex [contain:paint] max-w-page snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 sm:scroll-px-6 sm:px-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible">
+        {MUST.map((m, i) => {
           const item = findItem(m.id);
           return (
-            <li key={m.id} className="flex gap-4 rounded-2xl bg-white p-3 shadow-[0_1px_0_#E6D5BE] sm:flex-col sm:p-0 sm:pb-5">
-              <Photo
-                id={m.id}
-                alt={`${item.pt}: ${item.en}`}
-                className="aspect-square w-[112px] shrink-0 rounded-xl text-[11px] sm:w-full sm:rounded-b-none sm:rounded-t-2xl"
-              />
-              <div className="min-w-0 sm:px-5">
-                <h3 lang="pt-BR" className="font-display text-[24px] font-semibold leading-tight">
+            <li key={m.id} className="w-[78%] shrink-0 snap-start sm:w-[44%] lg:w-auto">
+              <article className="group">
+                <div className="relative">
+                  <Photo id={m.id} alt={`${item.pt}: ${item.en}`} className="aspect-[4/5] w-full rounded-3xl" imgClassName="transition-transform duration-500 group-hover:scale-[1.03]" />
+                  <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-2.5 py-1 font-display text-[15px] font-semibold tabular-nums text-cocoa">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {item.price != null && (
+                    <span className="absolute bottom-3 right-3 rounded-full bg-cocoa px-3 py-1.5 text-[15px] font-extrabold tabular-nums text-cream">
+                      {price(item.price)}
+                    </span>
+                  )}
+                </div>
+                <h3 lang="pt-BR" className="mt-4 font-display text-[26px] font-semibold leading-tight">
                   {item.pt}
                 </h3>
-                <p className="text-[14px] text-cocoa-soft">
+                <p className="mt-0.5 text-[15px] text-pink-deep">
                   <span className="sr-only">{t("must.say")}: </span>
-                  <span className="font-semibold italic tracking-wide">{m.say}</span>
+                  <span className="font-bold italic tracking-wide">{m.say}</span>
                 </p>
-                <p className="mt-2 text-[15px] leading-snug">{item.en}</p>
-                {item.price != null && <p className="mt-2 text-[16px] font-extrabold">{price(item.price)}</p>}
-              </div>
+                <p lang="en" className="mt-2 text-[16px] leading-snug text-cocoa-soft">
+                  {item.en}
+                </p>
+              </article>
             </li>
           );
         })}
-      </ul>
+      </ol>
+      <div className="mx-auto mt-6 max-w-page px-4 sm:hidden">
+        <Link href="#menu" className="btn-ghost w-full">
+          {t("must.fullMenu")} <Icon name="arrow" className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 }
@@ -293,12 +269,7 @@ export function Visit() {
       </h2>
       <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <OpenChip />
-            <SampleTag className="text-cocoa-soft" />
-          </div>
-          <p className="mt-3 text-[14px] font-semibold text-cocoa-soft">{t("visit.rating", { n: site.google.reviews })}</p>
-          <h3 className="mt-5 text-[15px] font-extrabold uppercase tracking-[0.14em] text-cocoa-soft">{t("visit.hours")}</h3>
+          <h3 className="text-[15px] font-extrabold uppercase tracking-[0.14em] text-cocoa-soft">{t("visit.hours")}</h3>
           <div className="mt-2">
             <HoursTable />
           </div>
@@ -349,9 +320,6 @@ export function Footer() {
               {site.phone.display}
             </a>
           </p>
-          <div className="mt-4 max-w-[260px] text-cream/90">
-            <HoursTable dark compact />
-          </div>
         </div>
         <nav aria-label={t("footer.links")}>
           <h2 className="text-[13px] font-extrabold uppercase tracking-[0.16em] text-pink-light">{t("footer.links")}</h2>

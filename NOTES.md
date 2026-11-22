@@ -27,3 +27,13 @@ Next.js 15 + Tailwind 3, static export, GitHub Pages at `/bet-concept` via `npm 
 - Menu descriptions are always English (per brief), under the Portuguese name, in both languages.
 - Açaí moved into its own tab (it's listed under Doces on the paper menu).
 - All swappable business data lives in `data/site.json`. The menu lives in `data/menu.json`, and UI copy in `data/i18n.ts`.
+
+## Round 3 research (2026-11-21)
+
+| Section | Reference | What we took |
+|---|---|---|
+| Language toggle | [Uber header](https://mobbin.com/screens/41010925-7d11-426c-92e8-5a7edf929087), [Amazon language menu](https://mobbin.com/screens/fb53cc4c-f068-43c8-924f-e330fa566531), [Duolingo](https://mobbin.com/screens/39d0954e-37c2-4c6b-958b-0ee6f14b7831) | "EN \| PT" read as two links with no clear state. Now a globe pill shows the current language (Uber); the menu lists each language in its own name with a check on the active one (Amazon). The mobile drawer shows English / Português as a two-option segmented control. |
+| Must-tries | [Huey bestsellers](https://mobbin.com/sites/sections/07378d8d-cb1d-4c47-8dad-4facc3339586), [Faire](https://mobbin.com/sites/sections/9842bc7f-62e4-4d69-8cb3-07bbd149a335), [Busy Bee best sellers](https://mobbin.com/sites/sections/6be73b33-2f79-4115-a4fa-607046b3e641), sweetgreen | Numbered cards (01–04), big 4:5 photos with the price as a chip on the photo, no card chrome, and a "See the full menu" link. On phones it's a swipeable row that peeks the next card instead of tiny thumbnails. |
+| Catering | [Whereby plans](https://mobbin.com/screens/e0dfe554-6bce-45eb-b91a-e225e0c66877), [Fiverr packages](https://mobbin.com/screens/9778a14a-465a-4354-b751-fcb847d0f28d), [OpenTable](https://mobbin.com/sites/sections/f289e722-625e-49bc-bf35-d935cfd479f3) | Intro copy plus a "what's in it" checklist next to the real photo, then three package cards (name, size, guests served, price, one action). "Choose this tray" pre-selects the tray in the request form and scrolls to it. |
+
+Gotcha: the header's `backdrop-filter` makes it the containing block for `position: fixed` children, so the mobile drawer must be portaled to `<body>`.

@@ -1,9 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "@/lib/lang";
 import { asset } from "@/lib/asset";
-import { openStatus, fmtTime, type OpenStatus } from "@/lib/hours";
-import type { Key } from "@/data/i18n";
 
 /** Real photo if it exists in public/photos/real/, otherwise a neutral labeled placeholder. Never AI imagery. */
 export function Photo({
@@ -48,67 +46,102 @@ export function Photo({
   );
 }
 
-export function LangToggle({ className = "", dark = false }: { className?: string; dark?: boolean }) {
+const LANGS = [
+  { id: "en", code: "EN", name: "English", html: "en" },
+  { id: "pt", code: "PT", name: "Português", html: "pt-BR" },
+] as const;
+
+/**
+ * Language menu (Uber-style globe pill + Amazon-style list): the pill shows the current language,
+ * the menu lists each language in its own name with a check on the active one.
+ * `inline` renders the two options as a full-width segmented choice (mobile drawer).
+ */
+export function LangToggle({ className = "", dark = false, inline = false }: { className?: string; dark?: boolean; inline?: boolean }) {
   const { lang, setLang, t } = useApp();
-  const btn = (l: "en" | "pt", label: string) => (
-    <button
-      type="button"
-      onClick={() => setLang(l)}
-      aria-pressed={lang === l}
-      lang={l === "pt" ? "pt-BR" : "en"}
-      className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded px-1.5 text-[15px] font-bold tracking-wide transition-colors ${
-        lang === l
-          ? `${dark ? "text-cream" : "text-cocoa"} underline decoration-2 underline-offset-4 ${dark ? "decoration-pink-light" : "decoration-pink"}`
-          : `${dark ? "text-cream/75 hover:text-cream" : "text-cocoa-soft hover:text-cocoa"}`
-      }`}
-    >
-      {label}
-    </button>
-  );
-  return (
-    <div role="group" aria-label={t("a11y.lang")} className={`flex items-center ${className}`}>
-      {btn("en", "EN")}
-      <span aria-hidden className={dark ? "text-cream/60" : "text-cocoa-soft"}>
-        |
-      </span>
-      {btn("pt", "PT")}
-    </div>
-  );
-}
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  const current = LANGS.find((l) => l.id === lang)!;
 
-export function useOpenStatus() {
-  const [status, setStatus] = useState<OpenStatus | null>(null);
   useEffect(() => {
-    const tick = () => setStatus(openStatus());
-    tick();
-    const id = window.setInterval(tick, 60_000);
-    return () => window.clearInterval(id);
-  }, []);
-  return status;
-}
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => !wrap.current?.contains(e.target as Node) && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
-export function useOpenLabel() {
-  const { t, lang } = useApp();
-  const s = useOpenStatus();
-  if (!s) return null;
-  if (s.kind === "open") return { open: true, text: t("hours.openUntil", { time: fmtTime(s.until, lang) }) };
-  if (s.kind === "later") return { open: false, text: t("hours.opensToday", { time: fmtTime(s.at, lang) }) };
-  return { open: false, text: t("hours.opensOn", { day: t(`dayShort.${s.day}` as Key), time: fmtTime(s.at, lang) }) };
-}
+  if (inline) {
+    return (
+      <div role="radiogroup" aria-label={t("a11y.lang")} className={`grid grid-cols-2 gap-1 rounded-full p-1 ${dark ? "bg-cream/10" : "bg-cream-deep"} ${className}`}>
+        {LANGS.map((l) => {
+          const on = l.id === lang;
+          return (
+            <button
+              key={l.id}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              lang={l.html}
+              onClick={() => setLang(l.id)}
+              className={`min-h-[44px] rounded-full px-4 text-[16px] font-bold transition-colors ${
+                on ? (dark ? "bg-cream text-cocoa" : "bg-cocoa text-cream") : dark ? "text-cream" : "text-cocoa"
+              }`}
+            >
+              {l.name}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
 
-/** Computed in the browser in America/New_York; hidden in the static HTML so it never shows a wrong guess. */
-export function OpenChip({ className = "", dark = false }: { className?: string; dark?: boolean }) {
-  const label = useOpenLabel();
   return (
-    <span
-      aria-live="polite"
-      className={`inline-flex min-h-[32px] items-center gap-2 whitespace-nowrap rounded-full px-3 text-[14px] font-semibold ${
-        dark ? "bg-cream/10 text-cream" : "bg-cream-deep text-cocoa"
-      } ${label ? "" : "invisible"} ${className}`}
-    >
-      <span aria-hidden className={`h-2 w-2 rounded-full ${label?.open ? "bg-emerald-600" : dark ? "bg-pink-light" : "bg-pink"}`} />
-      {label?.text ?? "Open"}
-    </span>
+    <div ref={wrap} className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-label={`${t("a11y.lang")}: ${current.name}`}
+        className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-full border-2 px-3 text-[15px] font-bold transition-colors ${
+          dark ? "border-cream/30 text-cream hover:bg-cream/10" : "border-cream-line text-cocoa hover:border-cocoa"
+        }`}
+      >
+        <Icon name="globe" className="h-[18px] w-[18px]" />
+        {current.code}
+        <Icon name="chevD" className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <ul className="absolute right-0 top-[calc(100%+6px)] z-50 w-48 overflow-hidden rounded-2xl border border-cream-line bg-white p-1.5 shadow-[0_16px_40px_-12px_rgba(62,35,24,0.35)]">
+          {LANGS.map((l) => {
+            const on = l.id === lang;
+            return (
+              <li key={l.id}>
+                <button
+                  type="button"
+                  lang={l.html}
+                  aria-current={on ? "true" : undefined}
+                  onClick={() => {
+                    setLang(l.id);
+                    setOpen(false);
+                  }}
+                  className={`flex min-h-[44px] w-full items-center justify-between rounded-xl px-3 text-left text-[16px] ${
+                    on ? "bg-cream font-extrabold text-cocoa" : "font-semibold text-cocoa hover:bg-cream"
+                  }`}
+                >
+                  {l.name}
+                  {on && <Icon name="check" className="h-5 w-5 text-pink" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -132,7 +165,7 @@ export function SampleTag({ className = "" }: { className?: string }) {
 export const price = (n: number) => `$${n.toFixed(2)}`;
 
 type IconName =
-  | "phone" | "menu" | "close" | "pin" | "ig" | "fb" | "cake" | "arrow" | "back" | "check" | "chevL" | "chevR" | "clock" | "gift" | "upload";
+  | "phone" | "menu" | "close" | "pin" | "ig" | "fb" | "cake" | "arrow" | "back" | "check" | "chevL" | "chevR" | "chevD" | "clock" | "gift" | "upload" | "globe" | "users";
 
 export function Icon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   const common = {
@@ -178,6 +211,12 @@ export function Icon({ name, className = "h-5 w-5" }: { name: IconName; classNam
       return <svg {...common}><path d="M15 6l-6 6 6 6" /></svg>;
     case "chevR":
       return <svg {...common}><path d="M9 6l6 6-6 6" /></svg>;
+    case "chevD":
+      return <svg {...common}><path d="M6 9l6 6 6-6" /></svg>;
+    case "globe":
+      return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" /></svg>;
+    case "users":
+      return <svg {...common}><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.6 3.5 5.2" /></svg>;
     case "clock":
       return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>;
     case "gift":
