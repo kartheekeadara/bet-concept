@@ -5,10 +5,11 @@ import site from "@/data/site.json";
 import { findItem } from "@/lib/menu";
 import { useApp } from "@/lib/lang";
 import { asset } from "@/lib/asset";
-import { HOURS, fmtTime, nowInBakeryTz } from "@/lib/hours";
+import { HOURS, fmtTime, nowInBakeryTz, openStatus, type OpenStatus } from "@/lib/hours";
 import type { Key } from "@/data/i18n";
 import { Eyebrow, Icon, Photo, price } from "@/components/ui";
 import { Logo } from "@/components/Header";
+import { dayInSentence } from "@/components/Menu";
 
 export const digits = (s: string) => s.replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
 
@@ -39,7 +40,6 @@ export function Hero() {
           {t("hero.title")}
         </h1>
         <p className="mt-4 max-w-xl font-display text-[22px] italic leading-snug text-cream sm:text-[28px]">{t("hero.sub")}</p>
-        <p className="mt-3 max-w-lg text-[17px] leading-relaxed text-cream/90">{t("hero.body")}</p>
       </div>
 
     </section>
@@ -58,17 +58,12 @@ export function MustTry() {
   const { t } = useApp();
   return (
     <section aria-labelledby="must-title" className="py-16 sm:py-24">
-      <div className="mx-auto flex max-w-page items-end justify-between gap-6 px-4 sm:px-6">
-        <div>
-          <Eyebrow>{t("must.eyebrow")}</Eyebrow>
-          <h2 id="must-title" className="h2">
-            {t("must.title")}
-          </h2>
-          <p className="mt-3 max-w-md text-[17px] text-cocoa-soft">{t("must.intro")}</p>
-        </div>
-        <Link href="#menu" className="hidden shrink-0 items-center gap-2 text-[16px] font-extrabold underline decoration-pink decoration-2 underline-offset-[6px] hover:text-pink-deep sm:inline-flex">
-          {t("must.fullMenu")} <Icon name="arrow" className="h-4 w-4" />
-        </Link>
+      <div className="mx-auto max-w-page px-4 sm:px-6">
+        <Eyebrow>{t("must.eyebrow")}</Eyebrow>
+        <h2 id="must-title" className="h2">
+          {t("must.title")}
+        </h2>
+        <p className="mt-3 max-w-md text-[17px] text-cocoa-soft">{t("must.intro")}</p>
       </div>
 
       {/* phones: swipeable row (snaps, peeks the next card); desktop: 4-up grid */}
@@ -104,11 +99,6 @@ export function MustTry() {
           );
         })}
       </ol>
-      <div className="mx-auto mt-6 max-w-page px-4 sm:hidden">
-        <Link href="#menu" className="btn-ghost w-full">
-          {t("must.fullMenu")} <Icon name="arrow" className="h-4 w-4" />
-        </Link>
-      </div>
     </section>
   );
 }
@@ -259,45 +249,75 @@ export function HoursTable({ dark = false, compact = false }: { dark?: boolean; 
   );
 }
 
+/** Live "Open until 7 PM" / "Closed · opens Tuesday 8 AM". Computed after mount so the static HTML never shows a stale state. */
+export function OpenNow({ className = "" }: { className?: string }) {
+  const { t, lang } = useApp();
+  const [s, setS] = useState<OpenStatus | null>(null);
+  useEffect(() => {
+    const tick = () => setS(openStatus());
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  if (!s) return <p className={`invisible ${className}`} aria-hidden>&nbsp;</p>;
+  const open = s.kind === "open";
+  const label =
+    s.kind === "open"
+      ? t("hours.openUntil", { time: fmtTime(s.until, lang) })
+      : s.kind === "later"
+        ? t("hours.opensToday", { time: fmtTime(s.at, lang) })
+        : t("hours.opensOn", { day: dayInSentence(t(`day.${s.day}` as Key), lang), time: fmtTime(s.at, lang) });
+  return (
+    <p className={`flex items-center gap-2.5 ${className}`}>
+      <span aria-hidden className={`relative flex h-3 w-3 shrink-0 rounded-full ${open ? "bg-open" : "bg-cocoa-soft/50"}`}>
+        {open && <span className="absolute inset-0 animate-ping rounded-full bg-open/60 motion-reduce:hidden" />}
+      </span>
+      {label}
+    </p>
+  );
+}
+
 export function Visit() {
-  const { t } = useApp();
+  const { t, lang } = useApp();
   return (
     <section id="visit" aria-labelledby="visit-title" className="mx-auto max-w-page px-4 py-16 sm:px-6 sm:py-24">
-      <Eyebrow>{t("visit.eyebrow")}</Eyebrow>
-      <h2 id="visit-title" className="h2">
-        {t("visit.title")}
-      </h2>
-      <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">
+      <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-16">
         <div>
-          <h3 className="text-[15px] font-extrabold uppercase tracking-[0.14em] text-cocoa-soft">{t("visit.hours")}</h3>
-          <div className="mt-2">
-            <HoursTable />
-          </div>
-        </div>
-        <div>
-          <a href={site.address.mapsUrl} target="_blank" rel="noopener" className="group block">
-            <Photo id="storefront" alt={`${site.name}, ${site.address.street}`} className="aspect-[16/9] w-full rounded-2xl" />
-            <span className="mt-4 flex items-start gap-3">
-              <Icon name="pin" className="mt-1 h-6 w-6 shrink-0 text-pink" />
-              <span className="text-[18px] leading-snug">
-                <span className="block font-extrabold group-hover:underline">{site.address.street}</span>
-                {site.address.city}, {site.address.region} {site.address.postal}
-                <span className="block text-[15px] text-cocoa-soft">{site.address.neighborhood}</span>
-              </span>
+          {/* the line painted on the bakery's own chalkboard wall */}
+          <h2 id="visit-title" lang="pt-BR" className="h2 max-w-[14ch]">
+            {t("visit.title")}
+          </h2>
+          {lang === "en" && <p className="mt-3 font-display text-[22px] italic text-cocoa-soft">{t("visit.sub")}</p>}
+
+          <OpenNow className="mt-8 text-[20px] font-extrabold" />
+
+          <a href={site.address.mapsUrl} target="_blank" rel="noopener" className="group mt-4 block w-fit">
+            <span className="block font-display text-[28px] font-semibold leading-tight group-hover:underline sm:text-[32px]">
+              {site.address.street}
+            </span>
+            <span className="mt-1 block text-[17px] text-cocoa-soft">
+              {site.address.city}, {site.address.region} {site.address.postal} · {site.address.neighborhood}
             </span>
           </a>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:max-w-lg">
             <a href={site.address.directionsUrl} target="_blank" rel="noopener" className="btn-primary">
               <Icon name="pin" /> {t("visit.directions")}
             </a>
             <a href={`tel:${site.phone.tel}`} className="btn-ghost">
-              <Icon name="phone" /> {t("visit.call", { phone: site.phone.display })}
-            </a>
-            <a href={site.instagram.url} target="_blank" rel="noopener" className="btn-ghost sm:col-span-2">
-              <Icon name="ig" /> {site.instagram.handle}
+              <Icon name="phone" /> {site.phone.display}
             </a>
           </div>
+
+          <div className="mt-10 max-w-lg">
+            <HoursTable />
+          </div>
         </div>
+
+        {/* native portrait ratio so the sign over the door stays in frame */}
+        <a href={site.address.mapsUrl} target="_blank" rel="noopener" tabIndex={-1} aria-hidden className="block">
+          <Photo id="storefront" alt="" className="aspect-[3/4] w-full rounded-3xl" imgClassName="object-[center_40%]" />
+        </a>
       </div>
     </section>
   );

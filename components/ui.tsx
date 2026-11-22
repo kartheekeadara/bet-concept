@@ -164,8 +164,21 @@ export function SampleTag({ className = "" }: { className?: string }) {
 
 export const price = (n: number) => `$${n.toFixed(2)}`;
 
+/** The little white tag from the pastry case: punched hole, tabular price, optional unit. */
+export function PriceTag({ amount, unit, className = "" }: { amount: number; unit?: string; className?: string }) {
+  return (
+    <span
+      className={`relative inline-flex items-baseline gap-1 whitespace-nowrap rounded-[6px] border border-cocoa/15 bg-white py-0.5 pl-5 pr-2.5 text-[16px] font-extrabold tabular-nums text-cocoa shadow-[0_1px_0_rgba(62,35,24,0.12)] ${className}`}
+    >
+      <span aria-hidden className="absolute left-2 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-cream-deep ring-1 ring-cocoa/25" />
+      {price(amount)}
+      {unit && <span className="text-[12px] font-semibold text-cocoa-soft">/ {unit}</span>}
+    </span>
+  );
+}
+
 type IconName =
-  | "phone" | "menu" | "close" | "pin" | "ig" | "fb" | "cake" | "arrow" | "back" | "check" | "chevL" | "chevR" | "chevD" | "clock" | "gift" | "upload" | "globe" | "users";
+  | "phone" | "menu" | "close" | "pin" | "ig" | "fb" | "cake" | "arrow" | "back" | "check" | "chevL" | "chevR" | "chevD" | "clock" | "gift" | "upload" | "globe" | "users" | "expand";
 
 export function Icon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   const common = {
@@ -226,6 +239,8 @@ export function Icon({ name, className = "h-5 w-5" }: { name: IconName; classNam
           <path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-3-5-3.5-5-1.5S10 8 12 8zm0 0c1.5-3 5-3.5 5-1.5S14 8 12 8z" />
         </svg>
       );
+    case "expand":
+      return <svg {...common}><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /></svg>;
     case "upload":
       return <svg {...common}><path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" /></svg>;
   }

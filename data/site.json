@@ -23,18 +23,17 @@
     "url": "https://www.instagram.com/brazilian_eatstreats/"
   },
   "facebook": {
-    "url": "https://www.facebook.com/",
-    "placeholder": true
+    "url": "https://www.facebook.com/marciajames2020"
   },
   "uberEatsUrl": "https://www.ubereats.com/search?q=Brazilian%20Eats%20%26%20Treats%20Charlotte",
   "timezone": "America/New_York",
   "hours": {
-    "sample": true,
+    "_source": "brazilianeatsandtreats.com (Tue–Sat 8–7, Sun 8–4); Monday closed",
     "_days": "0 = Sunday … 6 = Saturday; null = closed; 24h times",
     "days": [
       {
         "open": "08:00",
-        "close": "15:30"
+        "close": "16:00"
       },
       null,
       {
@@ -258,6 +257,10 @@
     "marcia": {
       "file": "marcia.jpg",
       "need": "Photo of Marcia (with permission)"
+    },
+    "counter": {
+      "file": "counter.jpg",
+      "need": "The glass pastry case at Brazilian Eats & Treats"
     },
     "storefront": {
       "file": "storefront.jpg",
