@@ -23,7 +23,7 @@ export type CakeState = {
   size: string;
   flavor: string;
   filling: string;
-  /** design style id (gallery.ts STYLES); optional */
+  /** design style id, set by the gallery cake they start from; optional */
   style: string;
   addons: string[];
   message: string;
@@ -73,6 +73,10 @@ export const EMPTY: CakeState = {
   email: "",
   notes: "",
 };
+
+/** Nothing picked yet (the occasion doesn't count): the preview shows an empty plate. */
+export const isIdleCake = (s: CakeState) =>
+  !s.start && !s.size && !s.flavor && !s.filling && !s.style && !s.message.trim() && !s.addons.length && !s.colorIds.length;
 
 export const sizeById = (id: string) => CAKES.sizes.find((s) => s.id === id);
 export const flavorById = (id: string) => CAKES.flavors.find((s) => s.id === id);

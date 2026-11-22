@@ -364,6 +364,14 @@
       "file": "cakes/cake-rip.jpg",
       "need": "Half black, half white 30th birthday cake"
     },
+    "cake-idle": {
+      "file": "cakes/cake-idle-plate.jpg",
+      "need": "Empty white plate on a wooden counter"
+    },
+    "cake-scratch": {
+      "file": "cakes/cake-scratch.jpg",
+      "need": "Plain white buttercream cake on a white plate"
+    },
     "chalkboard": {
       "file": "chalkboard.jpg",
       "need": "The chalkboard wall: que bom que você está aqui"

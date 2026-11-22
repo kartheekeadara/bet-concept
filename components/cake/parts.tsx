@@ -4,10 +4,15 @@ import type { Key } from "@/data/i18n";
 import { useApp } from "@/lib/lang";
 import { Icon, Photo, SampleTag } from "@/components/ui";
 import { galleryById } from "@/components/cake/gallery";
-import { CAKES, encodeShare, summaryLine, type CakeState } from "@/components/cake/cakeData";
-import { CakeArt } from "@/components/cake/CakeArt";
+import { CAKES, encodeShare, isIdleCake, summaryLine, type CakeState } from "@/components/cake/cakeData";
 
-export type ArtView = "photo" | "sketch";
+/** The preview is always a photo: empty plate, then Marcia's cake they started from, or the plain cake for "From scratch". */
+export function CakePhoto({ s }: { s: CakeState }) {
+  const insp = galleryById(s.start);
+  if (insp) return <Photo id={insp.id} alt="" className="h-full w-full" />;
+  if (isIdleCake(s)) return <Photo id="cake-idle" alt="" className="h-full w-full" imgClassName="object-[50%_75%]" />;
+  return <Photo id="cake-scratch" alt="" className="h-full w-full" />;
+}
 
 /**
  * Arrow-key movement for a WAI-ARIA radio group: one Tab stop per group, arrows move and select.
@@ -247,31 +252,6 @@ export function ShareButton({ s, className = "" }: { s: CakeState; className?: s
   );
 }
 
-export function ViewToggle({ view, setView, compact = false }: { view: ArtView; setView: (v: ArtView) => void; compact?: boolean }) {
-  const { t } = useApp();
-  return (
-    <div role="radiogroup" aria-label={t("cake.viewAs")} className="flex rounded-full bg-white/90 p-1 shadow backdrop-blur">
-      {(["photo", "sketch"] as const).map((v) => {
-        const on = view === v;
-        return (
-          <button
-            key={v}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            tabIndex={on ? 0 : -1}
-            onClick={() => setView(v)}
-            onKeyDown={radioKeys}
-            className={`rounded-full text-[13px] font-bold transition-colors ${compact ? "min-h-[32px] px-2.5" : "min-h-[36px] px-3"} ${on ? "bg-cocoa text-cream" : "text-cocoa"}`}
-          >
-            {t(v === "photo" ? "cake.photo" : "cake.sketch")}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 /** "Inspired by Marcia's Chocolate drip", from the gallery cake's style name. */
 export function useInspiredLabel(s: CakeState) {
   const { t } = useApp();
@@ -316,15 +296,11 @@ const COLLAPSE_AT = 120;
  */
 export function MobilePreview({
   s,
-  view,
-  setView,
   price,
   onOpen,
   openRef,
 }: {
   s: CakeState;
-  view: ArtView;
-  setView: (v: ArtView) => void;
   price: string;
   onOpen: () => void;
   openRef: React.RefObject<HTMLButtonElement | null>;
@@ -332,8 +308,6 @@ export function MobilePreview({
   const { t } = useApp();
   const [small, setSmall] = useState(false);
   const popRef = useRef<HTMLDivElement>(null);
-  const insp = galleryById(s.start);
-  const showPhoto = !!insp && view === "photo";
   const inspired = useInspiredLabel(s);
 
   useEffect(() => {
@@ -369,13 +343,8 @@ export function MobilePreview({
             }`}
           >
             <div ref={popRef} className="h-full w-full">
-              {showPhoto ? <Photo id={insp!.id} alt="" className="h-full w-full" /> : <CakeArt s={s} className="h-full w-full" />}
+              <CakePhoto s={s} />
             </div>
-            {insp && !small && (
-              <div className="absolute bottom-2 left-2 z-20">
-                <ViewToggle view={view} setView={setView} compact />
-              </div>
-            )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center p-3">
             <p className="font-display text-[18px] font-semibold leading-tight">{t("cake.summary")}</p>

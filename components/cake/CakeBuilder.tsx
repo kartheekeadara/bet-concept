@@ -7,7 +7,7 @@ import site from "@/data/site.json";
 import { useApp } from "@/lib/lang";
 import { fmtTime } from "@/lib/hours";
 import { Icon, Photo } from "@/components/ui";
-import { GALLERY, STYLES, galleryById } from "@/components/cake/gallery";
+import { GALLERY, galleryById } from "@/components/cake/gallery";
 import {
   CAKES,
   DIETARY,
@@ -22,7 +22,6 @@ import {
   earliestDate,
   emailOk,
   estimate,
-  stylePrice,
   fillingById,
   flavorById,
   fmtDate,
@@ -41,7 +40,7 @@ import {
 import { Calendar } from "@/components/cake/Calendar";
 import { CakeArt, FILLING_COLORS } from "@/components/cake/CakeArt";
 import { OccasionIcon } from "@/components/cake/OccasionIcon";
-import { DocinhosCard, MobilePreview, PhotoPicker, Pills, Section, ShareButton, ViewToggle, radioKeys, useFitPanel, useInspiredLabel, type ArtView } from "@/components/cake/parts";
+import { CakePhoto, DocinhosCard, MobilePreview, PhotoPicker, Pills, Section, ShareButton, radioKeys, useFitPanel, useInspiredLabel } from "@/components/cake/parts";
 
 // Start · Size · Inside · Outside · Pickup (+ contact) · Review
 const TOTAL = 6;
@@ -62,7 +61,6 @@ export function CakeBuilder() {
   const [reached, setReached] = useState(1);
   const [errors, setErrors] = useState<Errors>({});
   const [photos, setPhotos] = useState<string[]>([]);
-  const [artView, setArtView] = useState<ArtView>("photo");
   const [sharedNotice, setSharedNotice] = useState(false);
   const [orderNo, setOrderNo] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -167,7 +165,6 @@ export function CakeBuilder() {
       if (k === "date") next.time = "";
       return next;
     });
-    if (k === "start") setArtView("photo");
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
@@ -262,7 +259,6 @@ export function CakeBuilder() {
   const box = docinhoBox(s.docinhos);
   const estLabel = est === null ? "—" : est === "quote" ? (box ? t("cake.quotePlus", { n: box.price }) : t("cake.quote")) : `$${est.total}`;
   const stepLabels: Key[] = ["cake.s1", "cake.s2", "cake.s3", "cake.s4", quote ? "cake.q.step" : "cake.s5", quote ? "cake.q.review" : "cake.s7"];
-  const insp = galleryById(s.start);
   const recommended = sizeForGuests(Number(s.guests));
   const previewStep = step === 3 || step === 4;
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -356,7 +352,7 @@ export function CakeBuilder() {
 
           {/* the cake they ordered, with the summary and estimate */}
           <div className="rounded-3xl bg-white p-5 shadow-[0_1px_0_#E6D5BE,0_20px_40px_-24px_rgba(62,35,24,0.35)]">
-            <CakeStage s={s} view={artView} setView={setArtView} />
+            <CakeStage s={s} />
             <p className="mt-4 font-display text-[24px] font-semibold">{t("cake.summary")}</p>
             <MiniSummary s={s} />
             <div className="mt-5 border-t border-cream-line pt-4">
@@ -437,7 +433,7 @@ export function CakeBuilder() {
           className={`mt-4 w-full items-center gap-3 rounded-2xl bg-white p-2 pr-4 text-left shadow-[0_1px_0_#E6D5BE] ${previewStep ? "hidden md:flex" : "flex"}`}
         >
           <span className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl bg-cream">
-            {insp && artView === "photo" ? <Photo id={insp.id} alt="" className="h-full w-full" /> : <CakeArt s={s} className="h-full w-full" />}
+            <CakePhoto s={s} />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-display text-[18px] font-semibold leading-tight">{t("cake.summary")}</span>
@@ -447,7 +443,7 @@ export function CakeBuilder() {
         </button>
       </div>
 
-      {previewStep && hydrated && <MobilePreview s={s} view={artView} setView={setArtView} price={estLabel} onOpen={() => setSheetOpen(true)} openRef={previewRef} />}
+      {previewStep && hydrated && <MobilePreview s={s} price={estLabel} onOpen={() => setSheetOpen(true)} openRef={previewRef} />}
 
       <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-12">
         <div className={hydrated ? "" : "invisible"}>
@@ -497,9 +493,7 @@ export function CakeBuilder() {
                     id: "scratch",
                     content: (
                       <span className="flex h-full flex-col">
-                        <span className="flex aspect-square items-center justify-center rounded-t-[14px] bg-cream-deep">
-                          <CakeArt s={s} minimal className="h-4/5 w-4/5" />
-                        </span>
+                        <Photo id="cake-scratch" alt="" className="aspect-square w-full rounded-t-[14px]" />
                         <span className="block px-3 py-2.5">
                           <span className="block text-[15px] font-extrabold leading-tight">{t("cake.s1.scratch")}</span>
                           <span className="block text-[13px] text-cocoa-soft">{t("cake.s1.scratchHint")}</span>
@@ -637,16 +631,6 @@ export function CakeBuilder() {
 
           {step === 4 && (
             <Step title={t("cake.s4.title")} hint={t("cake.s4.hint")} headingRef={headingRef}>
-              {insp && (
-                <div className="mb-8 flex items-center gap-4 rounded-2xl bg-white p-3 pr-5 shadow-[0_1px_0_#E6D5BE]">
-                  <Photo id={insp.id} alt="" className="h-20 w-20 shrink-0 rounded-xl" />
-                  <div>
-                    <p className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-cocoa-soft">{t("cake.inspiration")}</p>
-                    <p className="text-[16px] font-bold leading-snug">{t(insp.key)}</p>
-                    <p className="text-[14px] text-cocoa-soft">{t("cake.inspirationNote")}</p>
-                  </div>
-                </div>
-              )}
               <DesignStep s={s} update={update} photos={photos} setPhotos={setPhotos} errors={errors} setErrors={setErrors} />
             </Step>
           )}
@@ -867,7 +851,7 @@ export function CakeBuilder() {
         >
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-5" data-summary-scroll tabIndex={0} aria-label={t("cake.summary")}>
             {/* the drawing gives up height first on short screens */}
-            <CakeStage s={s} view={artView} setView={setArtView} heightClass="h-[clamp(120px,32vh,380px)]" />
+            <CakeStage s={s} heightClass="h-[clamp(120px,32vh,380px)]" />
             <div className="mt-4 flex items-baseline justify-between gap-4">
               <p className="font-display text-[24px] font-semibold">{t("cake.summary")}</p>
               {s.occasion && <p className="text-[15px] text-cocoa-soft">{t(OCCASIONS.find((o) => o.id === s.occasion)!.key)}</p>}
@@ -897,7 +881,7 @@ export function CakeBuilder() {
             (previewRef.current?.offsetParent ? previewRef : stripRef).current?.focus();
           }}
         >
-          <CakeStage s={s} view={artView} setView={setArtView} />
+          <CakeStage s={s} />
           <MiniSummary s={s} />
           <div className="mt-5 border-t border-cream-line pt-4">
             <div className="flex items-baseline justify-between">
@@ -1142,48 +1126,25 @@ function DesignStep({
   setErrors: React.Dispatch<React.SetStateAction<Errors>>;
 }) {
   const { t } = useApp();
-  const styleRowRef = useRef<HTMLDivElement>(null);
+  const insp = galleryById(s.start);
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
   const colorNames = s.colorIds.map((c) => t(`cake.color.${c}` as Key)).join(", ");
   const addonNames = s.addons.map((a) => t(`cake.addon.${a}` as Key)).join(", ");
 
-  // phones: a pre-filled style may sit off-screen in the snap row, so bring it into view
-  useEffect(() => {
-    const row = styleRowRef.current?.querySelector<HTMLElement>('[role="radiogroup"]');
-    const on = row?.querySelector<HTMLElement>('[aria-checked="true"]');
-    if (row && on && row.scrollWidth > row.clientWidth) row.scrollLeft = on.offsetLeft - row.offsetLeft - 16;
-    // only when the step opens: later taps are already in view
-  }, []);
-
   return (
     <div className="space-y-2 md:space-y-10">
-      {/* styles = the cakes Marcia actually makes, shown with their real photos */}
-      <Section title={t("cake.s4.style")} defaultOpen summary={s.style ? t(`cake.style.${s.style}` as Key) : undefined}>
-        <p className="mb-3 text-[15px] text-cocoa-soft">{t("cake.s4.styleHint")}</p>
-        <div ref={styleRowRef}>
-          <Choice
-            name="style"
-            label={t("cake.s4.style")}
-            value={s.style}
-            onChange={(v) => update("style", v)}
-            cols="no-scrollbar relative -mx-4 flex snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 py-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:py-0"
-            optionClass="w-[40vw] shrink-0 snap-start p-0 text-left md:w-auto"
-            options={STYLES.map((st) => ({
-              id: st.id,
-              content: (
-                <span className="flex h-full flex-col">
-                  <Photo id={st.photo} alt="" className="aspect-[4/3] w-full rounded-t-[14px]" />
-                  <span className="flex flex-1 flex-col gap-0.5 px-3 py-2.5 md:flex-row md:items-start md:justify-between md:gap-2">
-                    <span className="text-[14px] font-bold leading-snug">{t(`cake.style.${st.id}` as Key)}</span>
-                    <span className={`shrink-0 text-[13px] font-extrabold tabular-nums ${stylePrice(st.id) ? "text-cocoa" : "text-cocoa-soft"}`}>
-                      {stylePrice(st.id) ? t("cake.plus", { n: stylePrice(st.id) }) : t("cake.included")}
-                    </span>
-                  </span>
-                </span>
-              ),
-            }))}
-          />
-        </div>
+      <Section title={t("cake.s4.photo")} defaultOpen summary={photos.length ? String(photos.length) : undefined}>
+        <PhotoPicker photos={photos} setPhotos={setPhotos} max={isQuote(s) ? 4 : 1} error={errors.photo} setError={(m) => setErrors((x) => ({ ...x, photo: m }))} />
+        {insp && (
+          <div className="mt-4 flex items-center gap-4 rounded-2xl bg-white p-3 pr-5 shadow-[0_1px_0_#E6D5BE]">
+            <Photo id={insp.id} alt="" className="h-20 w-20 shrink-0 rounded-xl" />
+            <div>
+              <p className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-cocoa-soft">{t("cake.inspiration")}</p>
+              <p className="text-[16px] font-bold leading-snug">{t(insp.key)}</p>
+              <p className="text-[14px] text-cocoa-soft">{t("cake.inspirationNote")}</p>
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section title={t("cake.s4.message")} defaultOpen summary={s.message ? `“${s.message}”` : undefined}>
@@ -1282,10 +1243,6 @@ function DesignStep({
             );
           })}
         </div>
-      </Section>
-
-      <Section title={t("cake.s4.photo")} summary={photos.length ? String(photos.length) : undefined}>
-        <PhotoPicker photos={photos} setPhotos={setPhotos} max={isQuote(s) ? 4 : 1} error={errors.photo} setError={(m) => setErrors((x) => ({ ...x, photo: m }))} />
       </Section>
 
       {/* kept out of the collapsibles: allergy needs should never be hidden */}
@@ -1568,27 +1525,20 @@ const dietaryLine = (s: CakeState, t: T) =>
 const withContact = (shared: CakeState, own: CakeState): CakeState => ({ ...shared, name: own.name, phone: own.phone, email: own.email, notes: own.notes });
 
 /**
- * The cake view: the live drawing, or (when they started from one of Marcia's cakes) that photo,
- * with a Photo / Sketch switch so they can still see their choices in the drawing.
+ * The cake view: always a photo (see CakePhoto), labeled when it's one of Marcia's cakes.
  */
-function CakeStage({ s, view, setView, heightClass = "aspect-[10/9] lg:aspect-[4/3]" }: { s: CakeState; view: ArtView; setView: (v: ArtView) => void; heightClass?: string }) {
+function CakeStage({ s, heightClass = "aspect-[10/9] lg:aspect-[4/3]" }: { s: CakeState; heightClass?: string }) {
   const insp = galleryById(s.start);
   const inspired = useInspiredLabel(s);
-  const showPhoto = !!insp && view === "photo";
   return (
     <div className="relative overflow-hidden rounded-2xl bg-[radial-gradient(ellipse_at_50%_35%,#FFFDF8_0%,#F6EBDC_70%)]">
       <div className={`w-full ${heightClass}`}>
-        {showPhoto ? <Photo id={insp!.id} alt="" className="h-full w-full" /> : <CakeArt s={s} className="h-full w-full p-2" />}
+        <CakePhoto s={s} />
       </div>
       {insp && (
         <span className="absolute left-3 right-3 top-3 w-fit max-w-[calc(100%-24px)] truncate rounded-full bg-cocoa/85 px-3 py-1 text-[12px] font-extrabold text-cream backdrop-blur">
           {inspired}
         </span>
-      )}
-      {insp && (
-        <div className="absolute bottom-3 right-3">
-          <ViewToggle view={view} setView={setView} />
-        </div>
       )}
     </div>
   );

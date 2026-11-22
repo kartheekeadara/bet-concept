@@ -19,7 +19,4 @@ export const GALLERY: { id: string; key: Key; style: string; colors: string[]; a
   { id: "cake-rip", style: "twotone", key: "cakes.g9", colors: [], addons: [] },
 ];
 
-/** Design styles offered in the builder, each illustrated by the gallery cake it came from. */
-export const STYLES = GALLERY.map((c) => ({ id: c.style, photo: c.id }));
-
 export const galleryById = (id: string) => GALLERY.find((g) => g.id === id);
