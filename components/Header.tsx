@@ -7,18 +7,17 @@ import { asset } from "@/lib/asset";
 import { Icon, LangToggle, OpenChip } from "@/components/ui";
 
 export function Logo({ dark = false, className = "" }: { dark?: boolean; className?: string }) {
-  const { photos, t } = useApp();
+  const { photos } = useApp();
+  const src = asset(photos.logo ?? "/photos/real/logo.png");
   return (
-    <Link href="/" aria-label={t("a11y.home")} className={`inline-flex min-h-[44px] items-center ${className}`}>
-      {photos.logo ? (
-        <img src={asset(photos.logo)} alt="" className="h-10 w-auto sm:h-12" />
-      ) : (
-        <span className="font-display leading-[0.95]" aria-hidden>
-          <span className={`block text-[20px] font-bold tracking-[-0.01em] sm:text-[22px] ${dark ? "text-cream" : "text-cocoa"}`}>
-            Brazilian Eats
-          </span>
-          <span className={`block text-[15px] font-semibold italic ${dark ? "text-pink-light" : "text-pink"}`}>&amp; Treats</span>
+    <Link href="/" className={`inline-flex min-h-[44px] items-center ${className}`}>
+      {dark ? (
+        // brown logo on a cream disc so it reads on dark sections
+        <span className="inline-flex rounded-full bg-cream p-1.5">
+          <img src={src} alt="Brazilian Eats & Treats" width={72} height={72} className="h-[72px] w-[72px]" />
         </span>
+      ) : (
+        <img src={src} alt="Brazilian Eats & Treats" width={44} height={44} className="h-11 w-11" />
       )}
     </Link>
   );

@@ -28,7 +28,11 @@ export function Hero() {
           </span>
         </div>
       )}
-      <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-cocoa-deep/90 via-cocoa-deep/45 to-cocoa-deep/10" />
+      {/* bottom-left gradient keeps the headline AA over the bright photo; the top-right of the photo stays clear */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(44,24,15,0.95)_0%,rgba(44,24,15,0.86)_48%,rgba(44,24,15,0.3)_78%,rgba(44,24,15,0)_100%)] lg:bg-[linear-gradient(to_top_right,rgba(44,24,15,0.96)_0%,rgba(44,24,15,0.9)_38%,rgba(44,24,15,0.5)_60%,rgba(44,24,15,0)_82%)]"
+      />
 
       <div className="mx-auto flex min-h-[min(80svh,720px)] max-w-page flex-col justify-end px-4 pb-10 pt-32 sm:px-6 sm:pb-16 lg:min-h-[min(86vh,780px)]">
         <h1 id="hero-title" lang="pt-BR" className="font-display text-[64px] font-semibold leading-[0.92] tracking-[-0.02em] sm:text-[96px] lg:text-[120px]">
@@ -123,7 +127,7 @@ export function MustTry() {
                   <span className="font-semibold italic tracking-wide">{m.say}</span>
                 </p>
                 <p className="mt-2 text-[15px] leading-snug">{item.en}</p>
-                <p className="mt-2 text-[16px] font-extrabold">{item.price != null ? price(item.price) : t("menu.ask")}</p>
+                {item.price != null && <p className="mt-2 text-[16px] font-extrabold">{price(item.price)}</p>}
               </div>
             </li>
           );
@@ -293,6 +297,7 @@ export function Visit() {
             <OpenChip />
             <SampleTag className="text-cocoa-soft" />
           </div>
+          <p className="mt-3 text-[14px] font-semibold text-cocoa-soft">{t("visit.rating", { n: site.google.reviews })}</p>
           <h3 className="mt-5 text-[15px] font-extrabold uppercase tracking-[0.14em] text-cocoa-soft">{t("visit.hours")}</h3>
           <div className="mt-2">
             <HoursTable />

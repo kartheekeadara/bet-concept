@@ -25,6 +25,7 @@ import {
 } from "@/components/cake/cakeData";
 import { Calendar } from "@/components/cake/Calendar";
 import { CakePreview } from "@/components/cake/CakePreview";
+import { OccasionIcon } from "@/components/cake/OccasionIcon";
 
 const TOTAL = 7;
 const prettyPhone = (p: string) => {
@@ -299,9 +300,7 @@ export function CakeBuilder() {
                   id: o.id,
                   content: (
                     <>
-                      <span aria-hidden className="text-[28px] leading-none">
-                        {o.glyph}
-                      </span>
+                      <OccasionIcon id={o.id} className="mx-auto h-9 w-9" />
                       <span className="mt-2 block text-[17px] font-extrabold">{t(o.key)}</span>
                     </>
                   ),

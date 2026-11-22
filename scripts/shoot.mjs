@@ -20,6 +20,19 @@ async function open(path, w, lang) {
   page.on("console", (m) => m.type() === "error" && problems.push(`[${lang} ${w} ${path}] console: ${m.text()}`));
   page.on("pageerror", (e) => problems.push(`[${lang} ${w} ${path}] pageerror: ${e.message}`));
   await page.goto(base + path, { waitUntil: "networkidle0" });
+  // scroll through once so lazy images load before full-page captures
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += 600) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+    // images inside display:none (e.g. the desktop-only hero card on phones) never load, so cap the wait
+    const loads = [...document.images].map((i) => (i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r))));
+    await Promise.race([Promise.all(loads), new Promise((r) => setTimeout(r, 5000))]);
+    window.scrollTo(0, 0);
+  });
+  const broken = await page.$$eval("img", (imgs) => imgs.filter((i) => i.offsetParent !== null && i.complete && i.naturalWidth === 0).map((i) => i.src));
+  if (broken.length) problems.push(`[${lang} ${w} ${path}] broken images: ${broken.join(", ")}`);
   await wait(400);
   return page;
 }
@@ -51,6 +64,35 @@ for (const lang of ["en", "pt"]) {
     await checkOverflow(home, `${lang} home ${w}`);
     const htmlLang = await home.evaluate(() => document.documentElement.lang);
     if (htmlLang !== (lang === "pt" ? "pt-BR" : "en")) problems.push(`${lang}: html lang is ${htmlLang}`);
+    // placeholders: only Marcia's photo may still be missing
+    const ph = await home.$$eval('[role="img"][aria-label]', (els) => els.map((e) => e.getAttribute("aria-label")).filter((l) => /Photo needed|Foto necessária/.test(l)));
+    if (ph.length !== 1 || !/Marcia/.test(ph[0])) problems.push(`${lang} ${w}: placeholders = ${JSON.stringify(ph)}`);
+    // sticky menu tabs must let go once #menu ends
+    const tabsLeak = await home.evaluate(async () => {
+      const cakes = document.getElementById("cakes");
+      window.scrollTo(0, cakes.getBoundingClientRect().top + window.scrollY + 200);
+      await new Promise((r) => setTimeout(r, 200));
+      const tabs = document.querySelector('[aria-label="Menu categories"], [aria-label="Categorias do cardápio"]').parentElement;
+      const r = tabs.getBoundingClientRect();
+      const res = r.bottom > 0 && r.bottom > cakes.getBoundingClientRect().top + 1;
+      window.scrollTo(0, 0);
+      return res;
+    });
+    if (tabsLeak) problems.push(`${lang} ${w}: menu tabs still stuck over #cakes`);
+    // hero contrast sample: hide the hero text and capture what sits behind the headline
+    if (lang === "en") {
+      await home.evaluate(() => window.scrollTo(0, 0));
+      const box = await home.$eval("#hero-title", (h) => {
+        const sec = h.closest("section");
+        sec.querySelectorAll("h1, p, a").forEach((e) => (e.style.visibility = "hidden"));
+        const rg = document.createRange();
+        rg.selectNodeContents(h);
+        const r = rg.getBoundingClientRect(); // the glyphs, not the full-width block
+        return { x: r.left, y: r.top + window.scrollY, width: Math.min(r.width, window.innerWidth - r.left), height: r.height };
+      });
+      await home.screenshot({ path: `screenshots/hero-bg-${w}.png`, clip: box });
+      await home.evaluate(() => document.querySelectorAll("#hero-title, section p, section a").forEach((e) => (e.style.visibility = "")));
+    }
     await home.evaluate(() => document.querySelectorAll(".fixed.bottom-0").forEach((e) => (e.style.display = "none")));
     await home.evaluate(() => (document.querySelector("header").style.position = "relative"));
     await home.screenshot({ path: `screenshots/${lang}-home-${w}.png`, fullPage: true });

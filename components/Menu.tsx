@@ -24,9 +24,10 @@ function Row({ item }: { item: Item }) {
   const thumb = photos.menu[item.id];
   return (
     <li className="flex gap-4 border-b border-cream-line py-4 last:border-b-0">
+      {thumb && <img src={asset(thumb)} alt={`${item.pt}: ${item.en}`} loading="lazy" width={56} height={56} className="h-14 w-14 shrink-0 rounded-xl object-cover" />}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <h4 lang="pt-BR" className="text-[16px] font-extrabold uppercase tracking-[0.04em]">
+          <h4 lang="pt-BR" className="text-[17px] font-extrabold">
             {item.pt}
           </h4>
           {item.popular && <Tag>{t("menu.tag.popular")}</Tag>}
@@ -37,7 +38,7 @@ function Row({ item }: { item: Item }) {
           {item.en}
         </p>
       </div>
-      <div className="flex shrink-0 items-start gap-3">
+      <div className="shrink-0">
         <p className="pt-0.5 text-right text-[16px] font-extrabold tabular-nums">
           {item.price != null ? (
             <>
@@ -48,7 +49,6 @@ function Row({ item }: { item: Item }) {
             <span className="block max-w-[6.5rem] text-[13px] font-semibold leading-tight text-cocoa-soft">{t("menu.ask")}</span>
           )}
         </p>
-        {thumb && <img src={asset(thumb)} alt={`${item.pt}: ${item.en}`} loading="lazy" className="h-16 w-16 rounded-xl object-cover" />}
       </div>
     </li>
   );

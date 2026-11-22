@@ -6,11 +6,11 @@ export const CAKES = site.cakes;
 export type Size = (typeof CAKES.sizes)[number];
 
 export const OCCASIONS = [
-  { id: "birthday", key: "cake.occ.birthday", glyph: "🎂" },
-  { id: "wedding", key: "cake.occ.wedding", glyph: "💍" },
-  { id: "baby", key: "cake.occ.baby", glyph: "🍼" },
-  { id: "graduation", key: "cake.occ.graduation", glyph: "🎓" },
-  { id: "just", key: "cake.occ.just", glyph: "💗" },
+  { id: "birthday", key: "cake.occ.birthday" },
+  { id: "wedding", key: "cake.occ.wedding" },
+  { id: "baby", key: "cake.occ.baby" },
+  { id: "graduation", key: "cake.occ.graduation" },
+  { id: "just", key: "cake.occ.just" },
 ] as const;
 
 export type CakeState = {

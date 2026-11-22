@@ -26,7 +26,7 @@ export function Photo({
       <div className={`overflow-hidden bg-cream-deep ${className}`}>
         <img
           src={asset(slot.src)}
-          alt={alt}
+          alt={alt === "" ? "" : slot.need || alt}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
           className={`h-full w-full object-cover ${imgClassName}`}

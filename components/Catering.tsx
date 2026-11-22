@@ -2,7 +2,7 @@
 import { useState } from "react";
 import site from "@/data/site.json";
 import { useApp } from "@/lib/lang";
-import { Eyebrow, Icon, SampleTag } from "@/components/ui";
+import { Eyebrow, Icon, Photo } from "@/components/ui";
 import { digits } from "@/components/sections";
 
 type Errors = Partial<Record<"name" | "phone" | "date" | "headcount", string>>;
@@ -66,18 +66,17 @@ export function Catering() {
       </h2>
       <p className="mt-3 max-w-xl text-[17px] leading-relaxed text-cocoa-soft">{t("catering.body")}</p>
 
-      <ul className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
-        {site.catering.trays.map((tr) => (
-          <li key={tr.id} className="rounded-2xl border-2 border-cream-line bg-white p-5">
-            <p className="text-[14px] font-bold text-cocoa-soft">{t("catering.tray")}</p>
-            <p className="font-display text-[40px] font-semibold leading-none">{tr.pieces}</p>
-            <p className="text-[15px] font-semibold">{t("catering.pieces", { n: tr.pieces })}</p>
-            <p className="mt-3 flex items-center gap-2 text-[18px] font-extrabold text-pink-deep">
-              {t("catering.from", { price: tr.from })} <SampleTag className="text-cocoa-soft" />
-            </p>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <Photo id="catering" alt={t("catering.photoAlt")} className="aspect-[4/3] w-full rounded-2xl" imgClassName="object-[center_62%]" />
+        <ul className="grid gap-3 md:grid-rows-3">
+          {site.catering.trays.map((tr) => (
+            <li key={tr.id} className="flex flex-col justify-center rounded-2xl border-2 border-cream-line bg-white px-5 py-4">
+              <p className="font-display text-[22px] font-semibold leading-tight">{t("catering.tray")}</p>
+              <p className="mt-1 text-[16px] font-bold text-pink-deep">{t("catering.line", { n: tr.pieces, price: tr.from })}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
         <div className="rounded-3xl bg-white p-5 shadow-[0_1px_0_#E6D5BE] sm:p-8">
