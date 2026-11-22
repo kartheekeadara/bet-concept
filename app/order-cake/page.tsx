@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/Header";
+import { Suspense } from "react";
+import { CheckoutHeader } from "@/components/Header";
 import { CakeBuilder } from "@/components/cake/CakeBuilder";
 import { CakeFooter } from "@/components/cake/CakeFooter";
 
@@ -11,9 +12,12 @@ export const metadata: Metadata = {
 export default function OrderCakePage() {
   return (
     <>
-      <Header />
+      <CheckoutHeader />
       <main id="main">
-        <CakeBuilder />
+        {/* useSearchParams (?from=) needs a Suspense boundary in a static export */}
+        <Suspense fallback={<div className="min-h-[70vh]" />}>
+          <CakeBuilder />
+        </Suspense>
       </main>
       <CakeFooter />
     </>

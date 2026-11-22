@@ -2,12 +2,13 @@
 import { useMemo, useState } from "react";
 import { useApp } from "@/lib/lang";
 import { Icon } from "@/components/ui";
-import { fmtDate, locale, todayYMD } from "@/components/cake/cakeData";
+import { fmtDate, isHoliday, isLimitedDate, locale, todayYMD } from "@/components/cake/cakeData";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * Month calendar. Disabled: past dates, Mondays (closed), anything inside the size's lead time.
+ * Month calendar. Disabled: past dates, Mondays and holidays (closed), anything inside the size's lead time.
+ * Open dates listed as limited in site.json carry a small "Limited" tag.
  * Keyboard: Tab to the grid, arrow keys move by day/week, Enter/Space selects.
  */
 export function Calendar({
@@ -37,8 +38,10 @@ export function Calendar({
     const count = new Date(Date.UTC(y, m, 0)).getUTCDate();
     const cells: (string | null)[] = Array(first).fill(null);
     for (let d = 1; d <= count; d++) cells.push(`${y}-${pad(m)}-${pad(d)}`);
+    // drop leading weeks that are entirely before today: seven rows of dead dates are just noise
+    while (cells.length >= 7 && cells.slice(0, 7).every((c) => c === null || c < today)) cells.splice(0, 7);
     return cells;
-  }, [y, m]);
+  }, [y, m, today]);
 
   const shift = (n: number) => {
     const d = new Date(Date.UTC(y, m - 1 + n, 1));
@@ -72,7 +75,7 @@ export function Calendar({
 
   return (
     <div>
-      <div className={`rounded-2xl border-2 bg-white p-3 sm:p-5 ${error ? "border-pink" : "border-cream-line"}`}>
+      <div className={`rounded-2xl border-2 bg-white p-3 sm:p-5 ${error ? "border-brand" : "border-cream-line"}`}>
         <div className="mb-3 flex items-center justify-between">
           <button
             type="button"
@@ -110,6 +113,9 @@ export function Calendar({
               const allowed = isAllowed(d);
               const selected = d === value;
               const isToday = d === today;
+              const limited = allowed && isLimitedDate(d);
+              const dateLabel = fmtDate(d, lang, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+              const aria = isHoliday(d) ? `${dateLabel}, ${t("cake.cal.closed")}` : limited ? `${dateLabel}, ${t("cake.cal.limited")}` : dateLabel;
               return (
                 <span key={d} role="gridcell" aria-selected={selected}>
                   <button
@@ -120,17 +126,24 @@ export function Calendar({
                     disabled={!allowed}
                     onClick={() => onChange(d)}
                     onKeyDown={(e) => onKey(e, d)}
-                    aria-label={fmtDate(d, lang, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                    data-closed={isHoliday(d) ? "holiday" : undefined}
+                    data-limited={limited ? "true" : undefined}
+                    aria-label={aria}
                     aria-pressed={selected}
-                    className={`relative flex h-11 w-full items-center justify-center rounded-xl text-[16px] font-bold tabular-nums transition-colors sm:h-12 ${
+                    className={`relative flex h-11 w-full flex-col items-center justify-center rounded-xl text-[16px] font-bold leading-none tabular-nums transition-colors sm:h-12 ${
                       selected
-                        ? "bg-pink text-white"
+                        ? "bg-brand text-white"
                         : allowed
                           ? "bg-cream text-cocoa hover:bg-cocoa hover:text-cream"
-                          : "cursor-not-allowed text-cocoa-soft/50 line-through decoration-1"
+                          : "cursor-not-allowed text-cocoa-soft/40"
                     }`}
                   >
                     {Number(d.slice(8))}
+                    {limited && (
+                      <span aria-hidden className="mt-0.5 text-[9px] font-extrabold leading-none tracking-tight">
+                        {t("cake.cal.limited")}
+                      </span>
+                    )}
                     {isToday && <span aria-hidden className="absolute bottom-1 h-1 w-1 rounded-full bg-current" />}
                   </button>
                 </span>

@@ -9,6 +9,7 @@
     "region": "NC",
     "postal": "28277",
     "neighborhood": "Ballantyne",
+    "landmark": "Hunters Crossing",
     "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Brazilian+Eats+%26+Treats+16049+Johnston+Rd+Ste+K+Charlotte+NC+28277",
     "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=16049+Johnston+Rd+Ste+K+Charlotte+NC+28277"
   },
@@ -59,18 +60,28 @@
     ]
   },
   "feijoada": {
-    "sample": true,
+    "price": 18.99,
     "nextDate": {
-      "en": "Sat, Dec 13",
-      "pt": "sáb., 13 de dez."
+      "en": "Sat, Dec 12",
+      "pt": "sáb., 12 de dez."
     }
   },
   "cakes": {
-    "sample": true,
     "deposit": 25,
     "leadDays": {
       "standard": 5,
       "tiered": 14
+    },
+    "_closedDates": "Holidays with no pickups (YYYY-MM-DD). limitedDates show a Limited tag on the calendar.",
+    "closedDates": ["2026-11-26", "2026-12-25", "2027-01-01"],
+    "limitedDates": ["2026-12-21", "2026-12-22", "2026-12-23", "2026-12-24", "2026-12-31"],
+    "docinhos": {
+      "sample": true,
+      "boxes": [
+        { "id": "25", "qty": 25, "price": 35 },
+        { "id": "50", "qty": 50, "price": 65 },
+        { "id": "100", "qty": 100, "price": 120 }
+      ]
     },
     "sizes": [
       {
@@ -99,7 +110,7 @@
         "label": "Tiered",
         "serves": "50+",
         "from": null,
-        "tiers": 3
+        "tiers": 2
       }
     ],
     "flavors": [
@@ -107,70 +118,141 @@
         "id": "brigadeiro",
         "pt": "Brigadeiro",
         "en": "Chocolate fudge",
-        "color": "#5A3324"
+        "color": "#5A3324",
+        "premium": 0
       },
       {
         "id": "beijinho",
         "pt": "Beijinho",
         "en": "Coconut",
-        "color": "#F5EEE2"
+        "color": "#F5EEE2",
+        "premium": 0
       },
       {
         "id": "doce-de-leite",
         "pt": "Doce de Leite",
         "en": "Milk caramel",
-        "color": "#C98B4E"
+        "color": "#C98B4E",
+        "premium": 0
       },
       {
         "id": "prestigio",
         "pt": "Prestígio",
         "en": "Chocolate & coconut",
-        "color": "#4A2A1E"
+        "color": "#4A2A1E",
+        "premium": 5
       },
       {
         "id": "ninho",
         "pt": "Ninho",
         "en": "Milk",
-        "color": "#FFF7E6"
+        "color": "#FFF7E6",
+        "premium": 0
       },
       {
         "id": "red-velvet",
         "pt": "Red Velvet",
         "en": "Red velvet",
-        "color": "#9E2A36"
+        "color": "#9E2A36",
+        "premium": 5
       }
     ],
     "fillings": [
       {
         "id": "brigadeiro",
         "pt": "Brigadeiro",
-        "en": "Chocolate fudge"
+        "en": "Chocolate fudge",
+        "premium": 0
       },
       {
         "id": "ninho",
         "pt": "Ninho",
-        "en": "Milk cream"
+        "en": "Milk cream",
+        "premium": 0
       },
       {
         "id": "morango",
         "pt": "Morango",
-        "en": "Strawberry"
+        "en": "Strawberry",
+        "premium": 5
       },
       {
         "id": "maracuja",
         "pt": "Mousse de Maracujá",
-        "en": "Passion fruit mousse"
+        "en": "Passion fruit mousse",
+        "premium": 5
       },
       {
         "id": "doce-de-leite",
         "pt": "Doce de Leite",
-        "en": "Milk caramel"
+        "en": "Milk caramel",
+        "premium": 0
       },
       {
         "id": "coco",
         "pt": "Coco",
-        "en": "Coconut"
+        "en": "Coconut",
+        "premium": 0
       }
+    ],
+    "_pricing": "Mockup prices: estimate = size base + premium flavor/filling + style + extras. Tiered = custom quote.",
+    "styles": {
+      "ridged": 0,
+      "sprinkles": 0,
+      "drip": 10,
+      "brushstroke": 10,
+      "twotone": 10,
+      "floral": 15,
+      "piped": 15,
+      "character": 25,
+      "showpiece": 40
+    },
+    "addons": [
+      {
+        "id": "strawberries",
+        "price": 8
+      },
+      {
+        "id": "flowers",
+        "price": 10
+      },
+      {
+        "id": "topper",
+        "price": 10
+      },
+      {
+        "id": "gold",
+        "price": 12
+      },
+      {
+        "id": "figure",
+        "price": 20
+      }
+    ],
+    "pairings": [
+      [
+        "brigadeiro",
+        "morango"
+      ],
+      [
+        "ninho",
+        "maracuja"
+      ],
+      [
+        "prestigio",
+        "coco"
+      ]
+    ],
+    "mostLoved": {
+      "flavor": "brigadeiro",
+      "filling": "morango"
+    },
+    "colorIdeas": [
+      "whiteGold",
+      "blush",
+      "pastel",
+      "chocolate",
+      "bright"
     ]
   },
   "catering": {
@@ -254,9 +336,45 @@
       "file": "cake-9.jpg",
       "need": "Layer cake slice"
     },
-    "marcia": {
-      "file": "marcia.jpg",
-      "need": "Photo of Marcia (with permission)"
+    "cake-wedding": {
+      "file": "cakes/cake-wedding.jpg",
+      "need": "Two-tier white wedding cake with sugar roses"
+    },
+    "cake-floral-tier": {
+      "file": "cakes/cake-floral-tier.jpg",
+      "need": "Two-tier floral cake with butterflies"
+    },
+    "cake-chanel": {
+      "file": "cakes/cake-chanel.jpg",
+      "need": "Designer handbag cake on a gold stand"
+    },
+    "cake-pink-piped": {
+      "file": "cakes/cake-pink-piped.jpg",
+      "need": "Vintage piped cake with pink bows"
+    },
+    "cake-red": {
+      "file": "cakes/cake-red.jpg",
+      "need": "Red and blue superhero birthday cake"
+    },
+    "cake-stroke": {
+      "file": "cakes/cake-stroke.jpg",
+      "need": "White cake with brushstroke buttercream"
+    },
+    "cake-rip": {
+      "file": "cakes/cake-rip.jpg",
+      "need": "Half black, half white 30th birthday cake"
+    },
+    "chalkboard": {
+      "file": "chalkboard.jpg",
+      "need": "The chalkboard wall: que bom que você está aqui"
+    },
+    "feijoada": {
+      "file": "feijoada.jpg",
+      "need": "A clay pot of feijoada with collard greens and orange"
+    },
+    "catering-tray": {
+      "file": "catering-tray.jpg",
+      "need": "A tray of coxinhas and kibe"
     },
     "counter": {
       "file": "counter.jpg",
