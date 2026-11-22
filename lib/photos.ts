@@ -15,11 +15,13 @@ export function resolvePhotos(): PhotoMap {
     slots[id] = { src: exists ? `/photos/real/${p.file}` : null, need: p.need };
   }
   const menu: Record<string, string> = {};
-  const menuDir = path.join(REAL, "menu");
-  if (fs.existsSync(menuDir)) {
+  // temporary stand-ins first (see public/photos/placeholder/CREDITS.md), then real photos override by id
+  for (const base of ["placeholder", "real"]) {
+    const menuDir = path.join(process.cwd(), "public", "photos", base, "menu");
+    if (!fs.existsSync(menuDir)) continue;
     for (const f of fs.readdirSync(menuDir)) {
       const m = f.match(/^(.+)\.(jpe?g|png|webp)$/i);
-      if (m) menu[m[1]] = `/photos/real/menu/${f}`;
+      if (m) menu[m[1]] = `/photos/${base}/menu/${f}`;
     }
   }
   const logoFile = ["logo.svg", "logo.png", "logo.webp"].find((f) => fs.existsSync(path.join(REAL, f)));

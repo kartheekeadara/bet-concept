@@ -7,14 +7,18 @@ export default {
       colors: {
         cream: { DEFAULT: "#FBF4EA", deep: "#F3E6D3", line: "#E6D5BE" },
         cocoa: { DEFAULT: "#3E2318", soft: "#6B4A3C", deep: "#2C180F" },
-        // Single accent. White on pink = 5.05:1. On cocoa backgrounds use pink-light.
+        // Brand accent = the red of the hand-painted "Bem-vindo!" mural in the shop.
+        // White on brand 5.34:1, brand on cream 4.89:1. On cocoa backgrounds use brand-light (7.28:1).
+        brand: { DEFAULT: "#C8312B", deep: "#A8261F", light: "#F2A598", wash: "#FBE4DF" },
+        // Cake section only (and the logo's pink cupcake). On cocoa use rose-light.
+        rose: { DEFAULT: "#C8336E", deep: "#A8255A", light: "#F4A6C2", wash: "#FBE3EC" },
         // status dot only (open now); never used for text
         open: "#2F8A57",
-        pink: { DEFAULT: "#C8336E", deep: "#A8255A", light: "#F4A6C2", wash: "#FBE3EC" },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        accent: ["var(--font-accent)", "Georgia", "serif"],
       },
       maxWidth: { page: "1200px" },
       keyframes: {

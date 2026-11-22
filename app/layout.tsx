@@ -1,16 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Nunito_Sans } from "next/font/google";
+import { Bricolage_Grotesque, Fraunces, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import site from "@/data/site.json";
 import { AppProvider } from "@/lib/lang";
 import { resolvePhotos } from "@/lib/photos";
 import { SkipLink } from "@/components/SkipLink";
 
-const display = Fraunces({
+// Display: Bricolage Grotesque, narrowed via its width axis for a padaria-signage feel.
+const display = Bricolage_Grotesque({
   subsets: ["latin", "latin-ext"],
-  weight: ["500", "600", "700"],
-  style: ["normal", "italic"],
+  axes: ["wdth", "opsz"],
   variable: "--font-display",
+  display: "swap",
+});
+// Accent: Fraunces italic only, for short warm lines (sublines, signature).
+const accent = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
+  style: ["italic"],
+  variable: "--font-accent",
   display: "swap",
 });
 const sans = Nunito_Sans({
@@ -75,7 +83,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+    <html lang="en" className={`${display.variable} ${accent.variable} ${sans.variable}`}>
       <body className="min-h-screen bg-cream font-sans text-[17px] text-cocoa antialiased">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <AppProvider photos={photos}>

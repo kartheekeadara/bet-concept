@@ -134,7 +134,7 @@ export function LangToggle({ className = "", dark = false, inline = false }: { c
                   }`}
                 >
                   {l.name}
-                  {on && <Icon name="check" className="h-5 w-5 text-pink" />}
+                  {on && <Icon name="check" className="h-5 w-5 text-brand" />}
                 </button>
               </li>
             );
@@ -147,7 +147,7 @@ export function LangToggle({ className = "", dark = false, inline = false }: { c
 
 export function Eyebrow({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
   return (
-    <p className={`mb-3 text-[13px] font-extrabold uppercase tracking-[0.16em] ${dark ? "text-pink-light" : "text-pink"}`}>{children}</p>
+    <p className={`mb-3 text-[13px] font-extrabold uppercase tracking-[0.16em] ${dark ? "text-brand-light" : "text-brand"}`}>{children}</p>
   );
 }
 
@@ -178,7 +178,7 @@ export function PriceTag({ amount, unit, className = "" }: { amount: number; uni
 }
 
 type IconName =
-  | "phone" | "menu" | "close" | "pin" | "ig" | "fb" | "cake" | "arrow" | "back" | "check" | "chevL" | "chevR" | "chevD" | "clock" | "gift" | "upload" | "globe" | "users" | "expand";
+  | "phone" | "menu" | "close" | "pin" | "ig" | "fb" | "cake" | "arrow" | "back" | "check" | "chevL" | "chevR" | "chevD" | "clock" | "gift" | "upload" | "globe" | "users" | "expand" | "star";
 
 export function Icon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   const common = {
@@ -239,6 +239,8 @@ export function Icon({ name, className = "h-5 w-5" }: { name: IconName; classNam
           <path d="M5 12v9h14v-9M12 8v13M12 8c-1.5-3-5-3.5-5-1.5S10 8 12 8zm0 0c1.5-3 5-3.5 5-1.5S14 8 12 8z" />
         </svg>
       );
+    case "star":
+      return <svg {...common} fill="currentColor" stroke="none"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" /></svg>;
     case "expand":
       return <svg {...common}><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /></svg>;
     case "upload":

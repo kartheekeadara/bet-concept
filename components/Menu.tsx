@@ -6,18 +6,22 @@ import type { Key } from "@/data/i18n";
 import { useApp } from "@/lib/lang";
 import { asset } from "@/lib/asset";
 import { nowInBakeryTz, openStatus } from "@/lib/hours";
-import { Eyebrow, Icon, PriceTag } from "@/components/ui";
+import { useScrollSpy } from "@/lib/useScrollSpy";
+import { Icon, PriceTag } from "@/components/ui";
 
 /*
- * "Vitrine" menu: one category at a time (tabs switch, they don't scroll the page).
- * Desktop: typographic list + a sticky display-case pane that shows the hovered/focused dish.
- * Phones: rows keep one left edge; dishes with a photo get a thumbnail on the right that opens a bottom sheet.
+ * "Balcão" menu: the whole menu in one scroll, every dish with its photo.
+ * Phones: sticky chip bar that follows the scroll; rows with the photo on the right; tap opens a bottom sheet.
+ * Tablet: two-column cards, photo on the left.
+ * Desktop: sticky category rail on the left (with the pickup CTA), two-column cards; click opens a centered dialog.
  */
 
-const TAB_KEY = "bet-menu-tab";
 /** Portuguese weekday names are lowercase mid-sentence ("voltam terça"). */
 export const dayInSentence = (name: string, lang: string) => (lang === "pt" ? name.toLowerCase() : name);
 const LUNCH_DAYS = [2, 3, 4, 5]; // Tue–Fri
+const secId = (c: MenuCategory) => `menu-${c.id}`;
+const SEC_IDS = categories.map(secId);
+const SPY_OFFSET = { base: 132, lg: 92 };
 
 function Price({ item }: { item: Item }) {
   const { t } = useApp();
@@ -25,11 +29,21 @@ function Price({ item }: { item: Item }) {
   return <PriceTag amount={item.price} unit={item.unitKey ? t(item.unitKey as Key) : undefined} />;
 }
 
+function Popular() {
+  const { t } = useApp();
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-cocoa px-1.5 py-[3px] align-[2px] text-[11px] font-extrabold uppercase leading-none tracking-wide text-cream">
+      <Icon name="star" className="h-3 w-3" />
+      {t("menu.popular")}
+    </span>
+  );
+}
+
 function Extra({ item }: { item: Item }) {
   const { t, lang } = useApp();
   if (!item.monthly) return null;
   return (
-    <span className="mt-1.5 block text-[14px] font-bold text-pink-deep">
+    <span className="mt-1.5 block text-[14px] font-bold text-brand-deep">
       {t("today.feijoada", { date: site.feijoada.nextDate[lang] })}
     </span>
   );
@@ -48,126 +62,114 @@ function LunchStatus() {
   }, [t, lang]);
   if (!msg) return null;
   return (
-    <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-cream px-3 py-1 text-[14px] font-extrabold">
+    <p className="inline-flex items-center gap-2 rounded-full bg-cream px-3 py-1 text-[14px] font-extrabold">
       <span aria-hidden className={`h-2.5 w-2.5 rounded-full ${msg.on ? "bg-open" : "bg-cocoa-soft/50"}`} />
       {msg.text}
     </p>
   );
 }
 
-function Row({
+function Dish({
   item,
-  active,
-  onPreview,
+  wide,
+  eager,
   onOpen,
 }: {
   item: Item;
-  active: boolean;
-  onPreview: (id: string) => void;
+  wide: boolean;
+  eager: boolean;
   onOpen: (item: Item, trigger: HTMLElement) => void;
 }) {
   const { photos } = useApp();
-  const thumb = photos.menu[item.id];
-
-  const body = (
-    <>
-      <span className="min-w-0 flex-1">
-        <span lang="pt-BR" className="block text-[18px] font-extrabold leading-snug">
-          {item.pt}
-        </span>
-        <span lang="en" className="mt-1 block text-[15px] leading-snug text-cocoa-soft">
-          {item.en}
-        </span>
-        <Extra item={item} />
-        {/* phones: price sits under the description so the right edge belongs to the photo */}
-        <span className="mt-2.5 block lg:hidden">
-          <Price item={item} />
-        </span>
-      </span>
-      <span className="hidden shrink-0 pt-0.5 lg:block">
-        <Price item={item} />
-      </span>
-      {thumb && (
-        <span className="relative shrink-0 lg:hidden">
-          <img src={asset(thumb)} alt="" loading="lazy" width={84} height={84} className="h-[84px] w-[84px] rounded-2xl object-cover" />
-          <span aria-hidden className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-cocoa text-cream ring-2 ring-white">
-            <Icon name="expand" className="h-3.5 w-3.5" />
-          </span>
-        </span>
-      )}
-    </>
-  );
-
-  const rowCls = `relative flex w-full gap-4 py-4 text-left transition-colors lg:-mx-4 lg:w-[calc(100%+2rem)] lg:rounded-2xl lg:px-4 ${
-    active ? "lg:bg-cream" : "lg:hover:bg-cream/60"
-  }`;
+  const src = photos.menu[item.id];
 
   return (
-    <li className="border-b border-cream-line last:border-b-0 lg:border-b-0" onMouseEnter={() => onPreview(item.id)}>
-      {thumb ? (
-        // Only dishes with a photo are interactive: desktop previews, phones open the sheet.
-        <button
-          type="button"
-          className={rowCls}
-          onFocus={() => onPreview(item.id)}
-          onClick={(e) => {
-            onPreview(item.id);
-            if (!window.matchMedia("(min-width: 1024px)").matches) onOpen(item, e.currentTarget);
-          }}
-        >
-          {body}
-        </button>
-      ) : (
-        <div className={rowCls}>{body}</div>
-      )}
+    <li className={wide ? "sm:col-span-2" : ""}>
+      <button
+        type="button"
+        onClick={(e) => onOpen(item, e.currentTarget)}
+        className="group flex h-full w-full gap-4 py-4 text-left transition-colors sm:rounded-2xl sm:border sm:border-cream-line sm:bg-white sm:p-3 sm:hover:border-cocoa/20 sm:hover:bg-cream/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+      >
+        {src && (
+          <span
+            className={`relative order-last shrink-0 overflow-hidden rounded-2xl bg-cream sm:order-first ${
+              wide ? "h-24 w-24 sm:aspect-[4/3] sm:h-auto sm:w-2/5 sm:self-stretch" : "h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32"
+            }`}
+          >
+            <img
+              src={asset(src)}
+              alt=""
+              loading={eager ? "eager" : "lazy"}
+              width={256}
+              height={256}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            />
+          </span>
+        )}
+        <span className={`flex min-w-0 flex-1 flex-col ${wide ? "sm:justify-center sm:py-2 sm:pr-3" : ""}`}>
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span lang="pt-BR" className={`font-extrabold leading-snug ${wide ? "text-[17px] sm:font-display sm:text-[30px] sm:font-semibold sm:leading-tight" : "text-[17px]"}`}>
+              {item.pt}
+            </span>
+            {item.popular && <Popular />}
+          </span>
+          <span lang="en" className={`mt-1 block text-[15px] leading-snug text-cocoa-soft ${wide ? "line-clamp-2 sm:line-clamp-none sm:text-[16px]" : "line-clamp-2"}`}>
+            {item.en}
+          </span>
+          <Extra item={item} />
+          <span className="mt-auto block pt-2.5">
+            <Price item={item} />
+          </span>
+        </span>
+      </button>
     </li>
   );
 }
 
-/** Desktop display case: the dish's photo, or a type card when there's no photo yet. */
-function Preview({ item, category }: { item: Item | undefined; category: MenuCategory }) {
-  const { photos } = useApp();
-  const src = item ? photos.menu[item.id] : undefined;
-  const vitrine = photos.slots.counter?.src;
+function noteIcon(id: string) {
+  return id === "pratos" ? "clock" : "check";
+}
+
+function Section({
+  cat,
+  first,
+  onOpen,
+}: {
+  cat: MenuCategory;
+  first: boolean;
+  onOpen: (item: Item, trigger: HTMLElement) => void;
+}) {
+  const { t } = useApp();
   return (
-    <div key={src ?? category.id} className="animate-fade">
-      {src ? (
-        <img src={asset(src)} alt="" className="aspect-[4/5] w-full rounded-3xl object-cover" />
-      ) : (
-        // no dish photo yet: the real pastry case, with the category name over it
-        <div className="relative isolate flex aspect-[4/5] w-full flex-col justify-end overflow-hidden rounded-3xl bg-cocoa p-8 text-cream">
-          {vitrine && <img src={asset(vitrine)} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />}
-          <span aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(44,24,15,0.92)_0%,rgba(44,24,15,0.55)_45%,rgba(44,24,15,0.1)_100%)]" />
-          <span lang="pt-BR" className="font-display text-[56px] font-semibold leading-[0.95]">
-            {category.pt}
-          </span>
-        </div>
+    <section id={secId(cat)} aria-labelledby={`${secId(cat)}-title`} className={`menu-sec ${first ? "pt-6 lg:pt-0" : "pt-12 sm:pt-14"}`}>
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-3">
+        <h3 id={`${secId(cat)}-title`} lang="pt-BR" className="font-display text-[36px] font-semibold leading-none sm:text-[44px]">
+          {cat.pt}
+        </h3>
+        {cat.id === "pratos" && <LunchStatus />}
+      </div>
+      {cat.noteKey && (
+        <p className="mt-4 flex max-w-xl items-start gap-2.5 rounded-xl bg-cream px-3.5 py-2.5 text-[15px] font-bold leading-snug text-cocoa">
+          <Icon name={noteIcon(cat.id)} className="mt-0.5 h-4 w-4 shrink-0 text-brand-deep" />
+          {t(cat.noteKey as Key)}
+        </p>
       )}
-      {item && (
-        <div className="mt-5 flex items-start justify-between gap-4">
-          <div>
-            <p lang="pt-BR" className="font-display text-[28px] font-semibold leading-tight">
-              {item.pt}
-            </p>
-            <p lang="en" className="mt-1 text-[16px] leading-snug text-cocoa-soft">
-              {item.en}
-            </p>
-          </div>
-          <span className="shrink-0 pt-1">
-            <Price item={item} />
-          </span>
-        </div>
-      )}
-    </div>
+      <ul className="mt-4 divide-y divide-cream-line sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:divide-y-0">
+        {cat.items.map((it) => (
+          <Dish key={it.id} item={it} wide={!!it.monthly || cat.items.length === 1} eager={first} onOpen={onOpen} />
+        ))}
+      </ul>
+    </section>
   );
 }
 
-/** Phone bottom sheet for a dish photo. Focus moves in, Esc / backdrop / swipe-down close, focus returns. */
-function Sheet({ item, onClose }: { item: Item; onClose: () => void }) {
+/** Same dish dialog at every size: bottom sheet on phones/tablets, centered card on desktop. */
+function DishDialog({ item, onClose }: { item: Item; onClose: () => void }) {
   const { t, photos } = useApp();
   const closeRef = useRef<HTMLButtonElement>(null);
   const startY = useRef<number | null>(null);
   const src = photos.menu[item.id];
+  const cat = categories.find((c) => c.items.some((i) => i.id === item.id));
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -188,122 +190,115 @@ function Sheet({ item, onClose }: { item: Item; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end bg-cocoa-deep/60 lg:hidden" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className="fixed inset-0 z-[60] flex items-end bg-cocoa-deep/60 lg:items-center lg:justify-center lg:p-8"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="sheet-title"
-        className="animate-sheet max-h-[92svh] w-full overflow-y-auto rounded-t-3xl bg-cream px-4 pb-[max(env(safe-area-inset-bottom),20px)] pt-3"
+        aria-labelledby="dish-title"
+        className="relative animate-sheet max-h-[92svh] w-full overflow-y-auto rounded-t-3xl bg-cream px-4 pb-[max(env(safe-area-inset-bottom),20px)] pt-3 sm:mx-auto sm:max-w-[560px] lg:grid lg:max-w-[880px] lg:animate-fade lg:grid-cols-2 lg:gap-8 lg:rounded-3xl lg:p-6"
         onTouchStart={(e) => (startY.current = e.touches[0].clientY)}
         onTouchEnd={(e) => {
           if (startY.current !== null && e.changedTouches[0].clientY - startY.current > 80) onClose();
           startY.current = null;
         }}
       >
-        <div className="flex items-center justify-between">
-          <span aria-hidden className="mx-auto h-1.5 w-12 rounded-full bg-cocoa/20" />
+        <span aria-hidden className="mx-auto block h-1.5 w-12 rounded-full bg-cocoa/20 lg:hidden" />
+        <div className="relative mt-3 lg:mt-0">
+          {src && <img src={asset(src)} alt={`${item.pt}: ${item.en}`} className="aspect-square w-full rounded-2xl object-cover lg:aspect-[4/5]" />}
         </div>
-        <div className="relative mt-3">
-          {src && <img src={asset(src)} alt={`${item.pt}: ${item.en}`} className="aspect-square w-full rounded-2xl object-cover" />}
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label={t("a11y.close")}
-            className="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-cream/95 text-cocoa"
-          >
-            <Icon name="close" className="h-6 w-6" />
-          </button>
-        </div>
-        <div className="mt-4 flex items-start justify-between gap-4">
-          <div>
-            <h4 id="sheet-title" lang="pt-BR" className="font-display text-[28px] font-semibold leading-tight">
+        {/* one close control: over the photo on phones, top-right of the card on desktop */}
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label={t("a11y.close")}
+          className="absolute right-7 top-[42px] inline-flex h-11 w-11 items-center justify-center rounded-full bg-cream/95 text-cocoa hover:bg-cream-deep lg:right-5 lg:top-5 lg:bg-white"
+        >
+          <Icon name="close" className="h-6 w-6" />
+        </button>
+        <div className="mt-4 lg:mt-0 lg:flex lg:flex-col lg:pt-14">
+          {cat && (
+            <p lang="pt-BR" className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-cocoa-soft lg:mt-auto">
+              {cat.pt}
+            </p>
+          )}
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h4 id="dish-title" lang="pt-BR" className="font-display text-[30px] font-semibold leading-tight lg:text-[40px]">
               {item.pt}
             </h4>
-            <p lang="en" className="mt-1 text-[16px] leading-snug text-cocoa-soft">
-              {item.en}
-            </p>
-            <Extra item={item} />
+            {item.popular && <Popular />}
           </div>
-          <span className="shrink-0 pt-1">
+          <p lang="en" className="mt-1 text-[16px] leading-snug text-cocoa-soft lg:text-[18px]">
+            {item.en}
+          </p>
+          <Extra item={item} />
+          {cat?.noteKey && <p className="mt-3 text-[14px] font-bold text-cocoa">{t(cat.noteKey as Key)}</p>}
+          <div className="mt-4 lg:mb-auto">
             <Price item={item} />
-          </span>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+function jumpTo(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
 export function Menu() {
-  const { t, photos } = useApp();
-  const [activeId, setActiveId] = useState(categories[0].id);
-  const [previewId, setPreviewId] = useState<string | undefined>();
-  const [sheet, setSheet] = useState<Item | null>(null);
+  const { t } = useApp();
+  const active = useScrollSpy(SEC_IDS, SPY_OFFSET);
+  const [dish, setDish] = useState<Item | null>(null);
   const trigger = useRef<HTMLElement | null>(null);
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
 
-  const cat = categories.find((c) => c.id === activeId) ?? categories[0];
-  const firstWithPhoto = cat.items.find((i) => photos.menu[i.id])?.id;
-  const preview = cat.items.find((i) => i.id === (previewId ?? firstWithPhoto)) ;
-
-  // remember the last category (per-viewer convenience only)
+  // keep the active chip visible inside the horizontal bar (scroll the bar only, never the page)
   useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(TAB_KEY);
-      if (saved && categories.some((c) => c.id === saved)) setActiveId(saved);
-    } catch {
-      /* storage blocked */
-    }
+    const bar = barRef.current;
+    const chip = bar?.querySelector<HTMLElement>(`[data-sec="${active}"]`);
+    if (!bar || !chip) return;
+    const left = chip.offsetLeft - 16;
+    const right = chip.offsetLeft + chip.offsetWidth + 16 - bar.clientWidth;
+    if (bar.scrollLeft > left) bar.scrollTo({ left, behavior: "smooth" });
+    else if (bar.scrollLeft < right) bar.scrollTo({ left: right, behavior: "smooth" });
+  }, [active]);
+
+  const open = useCallback((item: Item, el: HTMLElement) => {
+    trigger.current = el;
+    setDish(item);
   }, []);
-
-  const select = useCallback((id: string, focus = false) => {
-    setActiveId(id);
-    setPreviewId(undefined);
-    try {
-      window.localStorage.setItem(TAB_KEY, id);
-    } catch {
-      /* ignore */
-    }
-    const tab = tabsRef.current?.querySelector<HTMLElement>(`[data-cat="${id}"]`);
-    if (focus) tab?.focus();
-    tab?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
-    // if the list has scrolled up under the sticky tabs, bring its start back into view
-    const panel = panelRef.current;
-    if (panel && panel.getBoundingClientRect().top < 0) {
-      window.scrollTo({ top: window.scrollY + panel.getBoundingClientRect().top - 150, behavior: "smooth" });
-    }
-  }, []);
-
-  const onTabKey = (e: React.KeyboardEvent) => {
-    const i = categories.findIndex((c) => c.id === activeId);
-    const go = (n: number) => {
-      e.preventDefault();
-      select(categories[(n + categories.length) % categories.length].id, true);
-    };
-    if (e.key === "ArrowRight") go(i + 1);
-    else if (e.key === "ArrowLeft") go(i - 1);
-    else if (e.key === "Home") go(0);
-    else if (e.key === "End") go(categories.length - 1);
-  };
-
-  const closeSheet = useCallback(() => {
-    setSheet(null);
+  const close = useCallback(() => {
+    setDish(null);
     trigger.current?.focus();
   }, []);
+
+  const link = (c: MenuCategory) => ({
+    href: `#${secId(c)}`,
+    "aria-current": active === secId(c) ? ("true" as const) : undefined,
+    onClick: (e: React.MouseEvent) => {
+      e.preventDefault();
+      jumpTo(secId(c));
+    },
+  });
 
   return (
     <section id="menu" aria-labelledby="menu-title" className="bg-white">
       <div className="mx-auto max-w-page px-4 pt-16 sm:px-6 sm:pt-24">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <Eyebrow>{t("menu.eyebrow")}</Eyebrow>
             <h2 id="menu-title" className="h2">
               {t("menu.title")}
             </h2>
             <p className="mt-3 max-w-lg text-[17px] text-cocoa-soft">{t("menu.intro")}</p>
           </div>
-          <div className="flex flex-col items-start gap-1 sm:items-end">
+          <div className="flex flex-col items-start gap-1 sm:items-end lg:hidden">
             <a href={site.uberEatsUrl} target="_blank" rel="noopener" className="btn-primary">
               {t("menu.orderPickup")} <Icon name="arrow" className="h-4 w-4" />
             </a>
@@ -312,77 +307,72 @@ export function Menu() {
         </div>
       </div>
 
-      {/* sticky category tabs under the 68px header; switching shows one category at a time */}
-      <div className="sticky top-[68px] z-30 mt-8 border-y border-cream-line bg-white/95 backdrop-blur">
-        <div
-          ref={tabsRef}
-          role="tablist"
-          aria-label={t("menu.cat.label")}
-          onKeyDown={onTabKey}
-          className="no-scrollbar mx-auto flex max-w-page gap-2 overflow-x-auto px-4 py-2.5 sm:px-6"
-        >
+      {/* phones + tablets: sticky chips under the 68px header, following the scroll */}
+      <nav aria-label={t("menu.cat.label")} className="sticky top-[68px] z-30 mt-8 border-y border-cream-line bg-white/95 backdrop-blur lg:hidden">
+        <div ref={barRef} className="no-scrollbar mx-auto flex max-w-page gap-2 overflow-x-auto px-4 py-2.5 sm:px-6">
           {categories.map((c) => {
-            const on = c.id === activeId;
+            const on = active === secId(c);
             return (
-              <button
+              <a
                 key={c.id}
-                type="button"
-                role="tab"
-                id={`tab-${c.id}`}
-                data-cat={c.id}
+                {...link(c)}
+                data-sec={secId(c)}
                 lang="pt-BR"
-                aria-selected={on}
-                aria-controls="menu-panel"
-                tabIndex={on ? 0 : -1}
-                onClick={() => select(c.id)}
                 className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-full px-4 text-[15px] font-extrabold transition-colors ${
                   on ? "bg-cocoa text-cream" : "bg-cream text-cocoa hover:bg-cream-deep"
                 }`}
               >
                 {c.pt}
                 <span className={`text-[12px] font-bold tabular-nums ${on ? "text-cream/70" : "text-cocoa-soft"}`}>{c.items.length}</span>
-              </button>
+              </a>
             );
           })}
         </div>
-      </div>
+      </nav>
 
-      <div
-        ref={panelRef}
-        id="menu-panel"
-        role="tabpanel"
-        aria-labelledby={`tab-${cat.id}`}
-        className="mx-auto grid max-w-page gap-16 px-4 pb-16 pt-8 sm:px-6 sm:pb-24 lg:grid-cols-[1fr_minmax(360px,0.75fr)]"
-      >
-        <div>
-          <h3 lang="pt-BR" className="font-display text-[40px] font-semibold leading-none sm:text-[52px]">
-            {cat.pt}
-          </h3>
-          {cat.id === "pratos" && <LunchStatus />}
-          {cat.noteKey && <p className="mt-3 max-w-lg text-[15px] font-semibold text-pink-deep">{t(cat.noteKey as Key)}</p>}
-          <ul className="mt-6">
-            {cat.items.map((it) => (
-              <Row
-                key={it.id}
-                item={it}
-                active={preview?.id === it.id}
-                onPreview={setPreviewId}
-                onOpen={(item, el) => {
-                  trigger.current = el;
-                  setSheet(item);
-                }}
-              />
-            ))}
-          </ul>
-        </div>
-        <aside aria-hidden className="hidden lg:block">
-          <div className="sticky top-[160px]">
-            <Preview item={preview} category={cat} />
+      <div className="mx-auto max-w-page px-4 pb-16 sm:px-6 sm:pb-24 lg:mt-12 lg:grid lg:grid-cols-[200px_1fr] lg:gap-12">
+        {/* desktop: sticky rail with the pickup CTA always in reach */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-[100px]">
+            <nav aria-label={t("menu.cat.label")}>
+              <ul className="space-y-1">
+                {categories.map((c) => {
+                  const on = active === secId(c);
+                  return (
+                    <li key={c.id}>
+                      <a
+                        {...link(c)}
+                        lang="pt-BR"
+                        className={`relative flex items-center justify-between rounded-xl py-2 pl-4 pr-3 font-display text-[22px] font-semibold leading-tight transition-colors ${
+                          on ? "bg-cream text-cocoa" : "text-cocoa-soft hover:bg-cream/60 hover:text-cocoa"
+                        }`}
+                      >
+                        <span aria-hidden className={`absolute inset-y-2 left-0 w-1 rounded-full transition-colors ${on ? "bg-brand" : "bg-transparent"}`} />
+                        {c.pt}
+                        <span className="font-sans text-[13px] font-bold tabular-nums text-cocoa-soft">{c.items.length}</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+            <div className="mt-8 border-t border-cream-line pt-6">
+              <a href={site.uberEatsUrl} target="_blank" rel="noopener" className="btn-primary w-full justify-center">
+                {t("menu.orderPickup")} <Icon name="arrow" className="h-4 w-4" />
+              </a>
+              <p className="mt-2 text-center text-[13px] text-cocoa-soft">{t("menu.pickupNote")}</p>
+            </div>
           </div>
         </aside>
+
+        <div>
+          {categories.map((c, i) => (
+            <Section key={c.id} cat={c} first={i === 0} onOpen={open} />
+          ))}
+        </div>
       </div>
 
-      {sheet && <Sheet item={sheet} onClose={closeSheet} />}
+      {dish && <DishDialog item={dish} onClose={close} />}
     </section>
   );
 }

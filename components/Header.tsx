@@ -147,3 +147,31 @@ export function MobileBar() {
     </div>
   );
 }
+
+/**
+ * Checkout-mode header for /order-cake: logo, language, and a phone line for questions.
+ * No site nav and no "Order a cake" button, so people don't wander off mid-order (the draft is saved anyway).
+ */
+export function CheckoutHeader() {
+  const { t } = useApp();
+  return (
+    <header className="sticky top-0 z-40 border-b border-cream-line bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/85">
+      <div className="mx-auto flex h-[68px] max-w-page items-center gap-3 px-4 sm:px-6">
+        <Logo />
+        <p className="hidden font-accent text-[18px] italic text-cocoa-soft sm:block">{t("cake.pageTitle")}</p>
+        <div className="ml-auto flex items-center gap-2">
+          <a
+            href={`tel:${site.phone.tel}`}
+            aria-label={`${t("cake.questions")} ${site.phone.display}`}
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full px-3 text-[15px] font-bold text-cocoa hover:bg-cream-deep"
+          >
+            <Icon name="phone" className="h-[18px] w-[18px] text-brand" />
+            <span className="hidden text-cocoa-soft md:inline">{t("cake.questions")}</span>
+            <span className="hidden sm:inline">{site.phone.display}</span>
+          </a>
+          <LangToggle />
+        </div>
+      </div>
+    </header>
+  );
+}

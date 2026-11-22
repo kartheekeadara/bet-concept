@@ -7,7 +7,7 @@ import { useApp } from "@/lib/lang";
 import { asset } from "@/lib/asset";
 import { HOURS, fmtTime, nowInBakeryTz, openStatus, type OpenStatus } from "@/lib/hours";
 import type { Key } from "@/data/i18n";
-import { Eyebrow, Icon, Photo, price } from "@/components/ui";
+import { Icon, Photo, PriceTag, price } from "@/components/ui";
 import { Logo } from "@/components/Header";
 import { dayInSentence } from "@/components/Menu";
 
@@ -15,12 +15,13 @@ export const digits = (s: string) => s.replace(/\D/g, "").replace(/^1(?=\d{10}$)
 
 /* ───────────────────────── HERO ───────────────────────── */
 export function Hero() {
-  const { t, photos } = useApp();
+  const { t, lang, photos } = useApp();
   const hero = photos.slots.hero;
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden bg-cocoa text-cream">
       {hero.src ? (
-        <img src={asset(hero.src)} alt={t("hero.photoAlt")} className="absolute inset-0 -z-10 h-full w-full object-cover" />
+        // phones: shift right so the red "Bem-vindo!" mural stays in frame
+        <img src={asset(hero.src)} alt={t("hero.photoAlt")} className="absolute inset-0 -z-10 h-full w-full object-cover object-[66%_50%] lg:object-center" />
       ) : (
         <div className="absolute inset-0 -z-10 bg-[repeating-linear-gradient(135deg,#4A2C20_0_14px,#43271c_14px_28px)]">
           <span className="absolute right-4 top-4 max-w-[60%] rounded-md border-2 border-dashed border-cream/40 px-3 py-2 text-right text-[12px] font-semibold leading-snug text-cream/85">
@@ -32,14 +33,30 @@ export function Hero() {
       {/* bottom-left gradient keeps the headline AA over the bright photo; the top-right of the photo stays clear */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(44,24,15,0.95)_0%,rgba(44,24,15,0.86)_48%,rgba(44,24,15,0.3)_78%,rgba(44,24,15,0)_100%)] lg:bg-[linear-gradient(to_top_right,rgba(44,24,15,0.96)_0%,rgba(44,24,15,0.9)_38%,rgba(44,24,15,0.5)_60%,rgba(44,24,15,0)_82%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(44,24,15,0.95)_0%,rgba(44,24,15,0.82)_40%,rgba(44,24,15,0.15)_68%,rgba(44,24,15,0)_100%)] lg:bg-[linear-gradient(to_top_right,rgba(44,24,15,0.95)_0%,rgba(44,24,15,0.85)_34%,rgba(44,24,15,0.3)_56%,rgba(44,24,15,0)_74%)]"
       />
 
       <div className="mx-auto flex min-h-[min(80svh,720px)] max-w-page flex-col justify-end px-4 pb-10 pt-32 sm:px-6 sm:pb-16 lg:min-h-[min(86vh,780px)]">
-        <h1 id="hero-title" lang="pt-BR" className="font-display text-[64px] font-semibold leading-[0.92] tracking-[-0.02em] sm:text-[96px] lg:text-[120px]">
+        <h1 id="hero-title" lang="pt-BR" className="font-display text-[72px] font-bold leading-[0.88] sm:text-[112px] lg:text-[148px]">
           {t("hero.title")}
         </h1>
-        <p className="mt-4 max-w-xl font-display text-[22px] italic leading-snug text-cream sm:text-[28px]">{t("hero.sub")}</p>
+        <p className="mt-4 max-w-xl font-accent text-[22px] italic leading-snug text-cream sm:text-[28px]">{t("hero.sub")}</p>
+        <a
+          href={site.address.mapsUrl}
+          target="_blank"
+          rel="noopener"
+          className="mt-7 inline-flex w-fit items-center gap-2.5 rounded-full bg-cocoa-deep/55 py-2 pl-3 pr-4 text-[15px] ring-1 ring-cream/25 backdrop-blur transition-colors hover:bg-cocoa-deep/80"
+        >
+          <span aria-hidden className="flex text-brand-light">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Icon key={i} name="star" className="h-4 w-4" />
+            ))}
+          </span>
+          <span>
+            <b className="font-extrabold">{lang === "pt" ? String(site.google.rating).replace(".", ",") : site.google.rating}</b>{" "}
+            · {t("hero.reviews", { n: site.google.reviews })}
+          </span>
+        </a>
       </div>
 
     </section>
@@ -59,7 +76,6 @@ export function MustTry() {
   return (
     <section aria-labelledby="must-title" className="py-16 sm:py-24">
       <div className="mx-auto max-w-page px-4 sm:px-6">
-        <Eyebrow>{t("must.eyebrow")}</Eyebrow>
         <h2 id="must-title" className="h2">
           {t("must.title")}
         </h2>
@@ -68,26 +84,21 @@ export function MustTry() {
 
       {/* phones: swipeable row (snaps, peeks the next card); desktop: 4-up grid */}
       <ol className="no-scrollbar mx-auto mt-8 flex [contain:paint] max-w-page snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 sm:scroll-px-6 sm:px-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible">
-        {MUST.map((m, i) => {
+        {MUST.map((m) => {
           const item = findItem(m.id);
           return (
             <li key={m.id} className="w-[78%] shrink-0 snap-start sm:w-[44%] lg:w-auto">
               <article className="group">
                 <div className="relative">
                   <Photo id={m.id} alt={`${item.pt}: ${item.en}`} className="aspect-[4/5] w-full rounded-3xl" imgClassName="transition-transform duration-500 group-hover:scale-[1.03]" />
-                  <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-2.5 py-1 font-display text-[15px] font-semibold tabular-nums text-cocoa">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
                   {item.price != null && (
-                    <span className="absolute bottom-3 right-3 rounded-full bg-cocoa px-3 py-1.5 text-[15px] font-extrabold tabular-nums text-cream">
-                      {price(item.price)}
-                    </span>
+                    <PriceTag amount={item.price} unit={item.unitKey ? t(item.unitKey as Key) : undefined} className="absolute bottom-3 left-3 rotate-[-3deg]" />
                   )}
                 </div>
-                <h3 lang="pt-BR" className="mt-4 font-display text-[26px] font-semibold leading-tight">
+                <h3 lang="pt-BR" className="mt-4 font-display text-[28px] font-bold leading-tight">
                   {item.pt}
                 </h3>
-                <p className="mt-0.5 text-[15px] text-pink-deep">
+                <p className="mt-0.5 text-[15px] text-brand-deep">
                   <span className="sr-only">{t("must.say")}: </span>
                   <span className="font-bold italic tracking-wide">{m.say}</span>
                 </p>
@@ -109,9 +120,9 @@ export function Story() {
   return (
     <section aria-labelledby="story-title" className="bg-cream-deep">
       <div className="mx-auto grid max-w-page gap-10 px-4 py-16 sm:px-6 sm:py-24 md:grid-cols-[1fr_1.1fr] md:items-center md:gap-16">
-        <Photo id="marcia" alt={t("story.photoAlt")} className="aspect-[4/5] w-full rounded-3xl" />
+        {/* the chalkboard wall in the dining room: "so glad you're here" */}
+        <Photo id="chalkboard" alt={t("story.photoAlt")} className="aspect-[4/3] w-full rounded-3xl md:aspect-[4/5]" />
         <div>
-          <Eyebrow>{t("story.eyebrow")}</Eyebrow>
           <h2 id="story-title" className="h2">
             {t("story.title")}
           </h2>
@@ -120,16 +131,16 @@ export function Story() {
             <p>{t("story.p2")}</p>
             <p>{t("story.p3")}</p>
           </div>
-          <p className="mt-6 font-display text-[30px] font-semibold italic text-pink">{t("story.sign")}</p>
+          <p className="mt-6 font-accent text-[30px] font-semibold italic text-brand">{t("story.sign")}</p>
         </div>
       </div>
     </section>
   );
 }
 
-/* ───────────────────────── FEIJOADA SIGNUP + LOYALTY ───────────────────────── */
-export function FeijoadaAndLoyalty() {
-  const { t } = useApp();
+/* ───────────────────────── FEIJOADA SATURDAY ───────────────────────── */
+export function Feijoada() {
+  const { t, lang } = useApp();
   const [phone, setPhone] = useState("");
   const [err, setErr] = useState("");
   const [done, setDone] = useState(false);
@@ -143,15 +154,34 @@ export function FeijoadaAndLoyalty() {
   };
 
   return (
-    <section aria-label={`${t("feijoada.eyebrow")} · ${t("loyalty.title")}`} className="mx-auto max-w-page px-4 py-16 sm:px-6 sm:py-24">
-      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <div id="feijoada" className="scroll-mt-24 rounded-3xl bg-cocoa p-6 text-cream sm:p-10">
-          <Eyebrow dark>{t("feijoada.eyebrow")}</Eyebrow>
-          <h2 className="font-display text-[30px] font-semibold leading-tight sm:text-[38px]">{t("feijoada.title")}</h2>
-          <p className="mt-2 text-[17px] text-cream/90">{t("feijoada.body")}</p>
+    <section id="feijoada" aria-labelledby="feijoada-title" className="scroll-mt-20 bg-cocoa text-cream">
+      <div className="mx-auto grid max-w-page gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-cream/10 px-3 py-1 text-[13px] font-extrabold uppercase tracking-[0.14em] text-brand-light">
+            <Icon name="clock" className="h-4 w-4" /> {t("feijoada.kicker")}
+          </p>
+          <h2 id="feijoada-title" lang="pt-BR" className="mt-5 font-display text-[56px] font-bold leading-[0.9] sm:text-[84px]">
+            {t("feijoada.title")}
+          </h2>
+          <p className="mt-5 max-w-lg text-[18px] leading-relaxed text-cream/90">{t("feijoada.body")}</p>
+
+          <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4 border-y border-cream/15 py-5">
+            <div>
+              <dt className="text-[13px] font-extrabold uppercase tracking-[0.14em] text-cream/70">{t("feijoada.next")}</dt>
+              <dd className="mt-1 font-display text-[30px] font-bold leading-none">{site.feijoada.nextDate[lang]}</dd>
+            </div>
+            <div>
+              <dt className="text-[13px] font-extrabold uppercase tracking-[0.14em] text-cream/70">{t("feijoada.priceLabel")}</dt>
+              <dd className="mt-1 font-display text-[30px] font-bold leading-none tabular-nums">
+                {price(site.feijoada.price)}
+                <span className="ml-1.5 font-sans text-[15px] font-semibold text-cream/80">/ {t("menu.unit.plate")}</span>
+              </dd>
+            </div>
+          </dl>
+
           {done ? (
             <p role="status" className="mt-6 flex items-center gap-2 rounded-xl bg-cream/10 p-4 text-[17px] font-bold">
-              <Icon name="check" className="h-6 w-6 text-pink-light" /> {t("feijoada.done")}
+              <Icon name="check" className="h-6 w-6 text-brand-light" /> {t("feijoada.done")}
             </p>
           ) : (
             <form onSubmit={submit} noValidate className="mt-6">
@@ -168,47 +198,27 @@ export function FeijoadaAndLoyalty() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   aria-invalid={!!err}
-                  aria-describedby={err ? "feijoada-err" : undefined}
+                  aria-describedby={err ? "feijoada-err" : "feijoada-hint"}
                   className="field border-transparent sm:max-w-xs"
                 />
-                <button type="submit" className="btn bg-pink-light text-cocoa hover:bg-white">
+                <button type="submit" className="btn bg-brand-light text-cocoa hover:bg-white">
                   {t("feijoada.submit")}
                 </button>
               </div>
-              {err && (
-                <p id="feijoada-err" className="mt-2 text-[14px] font-bold text-pink-light">
+              {err ? (
+                <p id="feijoada-err" className="mt-2 text-[14px] font-bold text-brand-light">
                   {err}
+                </p>
+              ) : (
+                <p id="feijoada-hint" className="mt-2 text-[14px] text-cream/75">
+                  {t("feijoada.hint")}
                 </p>
               )}
             </form>
           )}
         </div>
 
-        <div className="relative rounded-3xl border-2 border-dashed border-cream-line bg-white p-6 sm:p-8">
-          <span className="absolute right-5 top-5 rounded-full bg-pink-wash px-3 py-1 text-[12px] font-extrabold uppercase tracking-wider text-pink-deep">
-            {t("loyalty.soon")}
-          </span>
-          <h2 className="font-display text-[28px] font-semibold leading-tight">{t("loyalty.title")}</h2>
-          <p className="text-[17px] text-cocoa-soft">{t("loyalty.body")}</p>
-          <ol className="mt-6 grid grid-cols-5 gap-2.5" aria-label={t("loyalty.title")}>
-            {Array.from({ length: 10 }, (_, i) => {
-              const filled = i < 3;
-              const last = i === 9;
-              return (
-                <li
-                  key={i}
-                  aria-label={last ? t("loyalty.free") : t("loyalty.stamp", { n: i + 1 })}
-                  className={`flex aspect-square items-center justify-center rounded-full text-[15px] font-extrabold ${
-                    filled ? "bg-pink text-white" : last ? "border-2 border-pink bg-pink-wash text-pink-deep" : "border-2 border-dashed border-cream-line text-cocoa-soft"
-                  }`}
-                >
-                  {last ? <Icon name="gift" className="h-5 w-5" /> : filled ? <Icon name="check" className="h-5 w-5" /> : i + 1}
-                </li>
-              );
-            })}
-          </ol>
-          <p className="mt-4 text-right text-[13px] font-bold text-cocoa-soft">3 / 10</p>
-        </div>
+        <Photo id="feijoada" alt={t("feijoada.photoAlt")} className="aspect-square w-full rounded-3xl" />
       </div>
     </section>
   );
@@ -235,7 +245,7 @@ export function HoursTable({ dark = false, compact = false }: { dark?: boolean; 
               <th scope="row" className={`text-left font-[inherit] ${compact ? "py-0.5" : "py-2.5"}`}>
                 {t(`day.${d}` as Key)}
                 {isToday && !compact && (
-                  <span className={`ml-2 rounded-full px-2 py-0.5 text-[12px] ${dark ? "bg-pink-light text-cocoa" : "bg-pink text-white"}`}>
+                  <span className={`ml-2 rounded-full px-2 py-0.5 text-[12px] ${dark ? "bg-brand-light text-cocoa" : "bg-brand text-white"}`}>
                     {t("hours.today")}
                   </span>
                 )}
@@ -278,16 +288,15 @@ export function OpenNow({ className = "" }: { className?: string }) {
 }
 
 export function Visit() {
-  const { t, lang } = useApp();
+  const { t } = useApp();
   return (
     <section id="visit" aria-labelledby="visit-title" className="mx-auto max-w-page px-4 py-16 sm:px-6 sm:py-24">
       <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-16">
         <div>
-          {/* the line painted on the bakery's own chalkboard wall */}
-          <h2 id="visit-title" lang="pt-BR" className="h2 max-w-[14ch]">
+          <h2 id="visit-title" className="h2 max-w-[16ch] sm:text-[56px]">
             {t("visit.title")}
           </h2>
-          {lang === "en" && <p className="mt-3 font-display text-[22px] italic text-cocoa-soft">{t("visit.sub")}</p>}
+          <p className="mt-3 font-accent text-[22px] italic text-cocoa-soft">{t("visit.sub")}</p>
 
           <OpenNow className="mt-8 text-[20px] font-extrabold" />
 
@@ -297,8 +306,7 @@ export function Visit() {
             </span>
             <span className="mt-1 block text-[17px] text-cocoa-soft">
               {site.address.city}, {site.address.region} {site.address.postal} · {site.address.neighborhood}
-            </span>
-          </a>
+            </span>          </a>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:max-w-lg">
             <a href={site.address.directionsUrl} target="_blank" rel="noopener" className="btn-primary">
@@ -342,7 +350,7 @@ export function Footer() {
           </p>
         </div>
         <nav aria-label={t("footer.links")}>
-          <h2 className="text-[13px] font-extrabold uppercase tracking-[0.16em] text-pink-light">{t("footer.links")}</h2>
+          <h2 className="text-[13px] font-extrabold uppercase tracking-[0.16em] text-brand-light">{t("footer.links")}</h2>
           <ul className="mt-3">
             {(
               [
@@ -362,7 +370,7 @@ export function Footer() {
           </ul>
         </nav>
         <div>
-          <h2 className="text-[13px] font-extrabold uppercase tracking-[0.16em] text-pink-light">{t("footer.follow")}</h2>
+          <h2 className="text-[13px] font-extrabold uppercase tracking-[0.16em] text-brand-light">{t("footer.follow")}</h2>
           <ul className="mt-3">
             <li>
               <a href={site.instagram.url} target="_blank" rel="noopener" className="inline-flex min-h-[44px] items-center gap-2 text-[17px] hover:underline">

@@ -23,7 +23,7 @@ Next.js 15 + Tailwind 3, static export, GitHub Pages at `/bet-concept` via `npm 
 - Palette: cream `#FBF4EA` background, chocolate `#3E2318` text and dark sections, pink `#C8336E` as the single accent. White on pink is 5.05:1 and brown on cream is 13.2:1. On brown sections the accent switches to light pink `#F4A6C2` (7.6:1).
 - Type: Fraunces (warm, soft display serif) for headings and Nunito Sans for body. Both cover Portuguese diacritics.
 - The logo hasn't been supplied yet, so the header uses a typographic wordmark. If `public/photos/real/logo.png` exists, it is used instead.
-- Photos: `lib/photos.ts` checks `public/photos/real/` at build time. A missing photo renders a dashed neutral block that says which photo is needed. No AI imagery anywhere.
+- Photos: `lib/photos.ts` checks `public/photos/real/` at build time. A missing photo renders a dashed neutral block that says which photo is needed. No AI-generated food; real photos were AI-retouched in round 4 (light, background, cleanup only; see retouch-pack/PROMPTS.md). Unretouched originals are in photo-originals/ and retouch-pack/originals/ (both gitignored).
 - Menu descriptions are always English (per brief), under the Portuguese name, in both languages.
 - Açaí moved into its own tab (it's listed under Doces on the paper menu).
 - All swappable business data lives in `data/site.json`. The menu lives in `data/menu.json`, and UI copy in `data/i18n.ts`.
@@ -37,3 +37,12 @@ Next.js 15 + Tailwind 3, static export, GitHub Pages at `/bet-concept` via `npm 
 | Catering | [Whereby plans](https://mobbin.com/screens/e0dfe554-6bce-45eb-b91a-e225e0c66877), [Fiverr packages](https://mobbin.com/screens/9778a14a-465a-4354-b751-fcb847d0f28d), [OpenTable](https://mobbin.com/sites/sections/f289e722-625e-49bc-bf35-d935cfd479f3) | Intro copy plus a "what's in it" checklist next to the real photo, then three package cards (name, size, guests served, price, one action). "Choose this tray" pre-selects the tray in the request form and scrolls to it. |
 
 Gotcha: the header's `backdrop-filter` makes it the containing block for `position: fixed` children, so the mobile drawer must be portaled to `<body>`.
+
+## Round 4 (2026-11-22): see docs/REVISION-PLAN.md
+
+Decisions confirmed by the client side: mural red replaces hot pink as the brand accent (pink kept as `rose` for the cake section and the logo); Bricolage Grotesque (width axis 80) for display with Fraunces italic as an accent; loyalty card cut; hero shows the Google rating only (no open/closed line); Uber Eats link stays a placeholder; anything unknown is made up for the mockup.
+
+- Menu: one category at a time ("vitrine"), desktop preview pane, phone bottom sheet, case-style price tags.
+- Photos: custom cakes, chalkboard wall, X-Frango, kibe and frango à milanesa come from the bakery's Google Maps listing; feijoada, mousse and the coxinha/kibe tray from brazilianeatsandtreats.com.
+- Made up for the mockup: pão de queijo $1.75, coxinha de brigadeiro $3.50, feijoada $18.99, açaí $8.99/$11.99, next feijoada Sat Dec 12, "free parking out front". Hunters Crossing is from the Google listing.
+- Visit: live open status, then address, directions/call, hours; storefront at native portrait ratio.

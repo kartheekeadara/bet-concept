@@ -1,5 +1,5 @@
 import { Header, MobileBar } from "@/components/Header";
-import { Hero, MustTry, Story, FeijoadaAndLoyalty, Visit, Footer } from "@/components/sections";
+import { Hero, MustTry, Story, Feijoada, Visit, Footer } from "@/components/sections";
 import { Menu } from "@/components/Menu";
 import { Cakes } from "@/components/Cakes";
 import { Catering } from "@/components/Catering";
@@ -14,8 +14,8 @@ export default function Home() {
         <Menu />
         <Cakes />
         <Catering />
+        <Feijoada />
         <Story />
-        <FeijoadaAndLoyalty />
         <Visit />
       </main>
       <Footer />

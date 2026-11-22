@@ -62,6 +62,7 @@ const en = {
   "menu.note.lanches": "All lanches come with fries.",
   "menu.note.pratos": "Tuesday to Friday. Served with rice, beans, salad, and yuca or fries.",
   "menu.cat.label": "Menu categories",
+  "menu.popular": "Popular",
 
   "cakes.title": "Cakes that steal the party",
   "cakes.body": "Weddings, birthdays, baby showers, inside jokes. Brazilian fillings like brigadeiro, ninho and passion fruit mousse, decorated by hand to whatever you dream up.",
@@ -416,6 +417,7 @@ const pt: Dict = {
   "menu.note.lanches": "Todos os lanches vêm com batata frita.",
   "menu.note.pratos": "De terça a sexta. Com arroz, feijão, salada e mandioca ou fritas.",
   "menu.cat.label": "Categorias do cardápio",
+  "menu.popular": "Favorito",
 
   "cakes.title": "Bolos que roubam a festa",
   "cakes.body": "Casamentos, aniversários, chás de bebê, piadas internas. Recheios brasileiros como brigadeiro, ninho e mousse de maracujá, decorados à mão do jeito que você sonhar.",

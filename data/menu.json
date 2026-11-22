@@ -1,29 +1,29 @@
 {
-  "_comment": "From the current in-store menu. price: null = not printed on the menu (show 'Ask at the counter'). Thumbnails: add public/photos/real/menu/<id>.jpg",
+  "_comment": "Mockup menu. Prices for pão de queijo, coxinha de brigadeiro, feijoada and açaí are made up for the concept. Thumbnails: public/photos/real/menu/<id>.jpg",
   "categories": [
     {
       "id": "salgados",
       "pt": "Salgados",
       "items": [
-        { "id": "coxinha", "pt": "Coxinha", "en": "Shredded chicken in a crispy teardrop dough", "price": 4.0, "popular": true },
-        { "id": "coxinha-catupiry", "pt": "Coxinha Catupiry", "en": "Our coxinha with a creamy catupiry cheese center", "price": 4.5 },
-        { "id": "pao-de-queijo", "pt": "Pão de Queijo", "en": "Warm, chewy cheese bread made with tapioca flour", "price": null, "popular": true },
-        { "id": "pastel", "pt": "Pastel", "en": "Big, crackly fried pastry: beef, cheese, chicken with catupiry, or pizza", "price": 5.5, "popular": true },
-        { "id": "bolinho-de-mandioca", "pt": "Bolinho de Mandioca", "en": "Golden yuca fritter with a savory filling", "price": 4.0 },
-        { "id": "enroladinho", "pt": "Enroladinho", "en": "Soft dough rolled around a sausage, baked golden", "price": 4.0 },
-        { "id": "kibe", "pt": "Kibe", "en": "Crispy bulgur-and-beef croquette, Brazilian-Lebanese style", "price": 4.0 },
-        { "id": "risoles", "pt": "Risoles", "en": "Breaded half-moon turnover with a creamy filling", "price": 4.0 }
+        {"id": "coxinha", "pt": "Coxinha", "en": "Shredded chicken in a crispy teardrop dough", "price": 4.0, "popular": true},
+        {"id": "coxinha-catupiry", "pt": "Coxinha Catupiry", "en": "Our coxinha with a creamy catupiry cheese center", "price": 4.5},
+        {"id": "pao-de-queijo", "pt": "Pão de Queijo", "en": "Warm, chewy cheese bread made with tapioca flour", "price": 1.75, "popular": true, "unitKey": "menu.unit.each"},
+        {"id": "pastel", "pt": "Pastel", "en": "Big, crackly fried pastry: beef, cheese, chicken with catupiry, or pizza", "price": 5.5, "popular": true},
+        {"id": "bolinho-de-mandioca", "pt": "Bolinho de Mandioca", "en": "Golden yuca fritter with a savory filling", "price": 4.0},
+        {"id": "enroladinho", "pt": "Enroladinho", "en": "Soft dough rolled around a sausage, baked golden", "price": 4.0},
+        {"id": "kibe", "pt": "Kibe", "en": "Crispy bulgur-and-beef croquette, Brazilian-Lebanese style", "price": 4.0},
+        {"id": "risoles", "pt": "Risoles", "en": "Breaded half-moon turnover with a creamy filling", "price": 4.0}
       ]
     },
     {
       "id": "sanduiches",
       "pt": "Sanduíches",
       "items": [
-        { "id": "bauru", "pt": "Bauru", "en": "Ham, melted cheese and tomato on a toasted roll", "price": 5.0 },
-        { "id": "misto-quente", "pt": "Misto Quente", "en": "Pressed hot ham and cheese", "price": 4.75 },
-        { "id": "pao-com-ovo", "pt": "Pão com Ovo", "en": "Fried egg on a fresh French roll", "price": 4.5 },
-        { "id": "pao-com-queijo", "pt": "Pão com Queijo", "en": "Fresh roll with melted cheese", "price": 4.0 },
-        { "id": "pao-com-manteiga", "pt": "Pão com Manteiga", "en": "Toasted French roll with butter, the Brazilian breakfast", "price": 3.0 }
+        {"id": "bauru", "pt": "Bauru", "en": "Ham, melted cheese and tomato on a toasted roll", "price": 5.0},
+        {"id": "misto-quente", "pt": "Misto Quente", "en": "Pressed hot ham and cheese", "price": 4.75},
+        {"id": "pao-com-ovo", "pt": "Pão com Ovo", "en": "Fried egg on a fresh French roll", "price": 4.5},
+        {"id": "pao-com-queijo", "pt": "Pão com Queijo", "en": "Fresh roll with melted cheese", "price": 4.0},
+        {"id": "pao-com-manteiga", "pt": "Pão com Manteiga", "en": "Toasted French roll with butter, the Brazilian breakfast", "price": 3.0}
       ]
     },
     {
@@ -31,13 +31,13 @@
       "pt": "Lanches",
       "noteKey": "menu.note.lanches",
       "items": [
-        { "id": "x-burguer", "pt": "X-Burguer", "en": "Beef burger with melted cheese", "price": 12.9 },
-        { "id": "x-egg", "pt": "X-Egg", "en": "Cheeseburger topped with a fried egg", "price": 12.9 },
-        { "id": "x-bacon", "pt": "X-Bacon", "en": "Cheeseburger loaded with crispy bacon", "price": 13.9 },
-        { "id": "x-frango", "pt": "X-Frango", "en": "Grilled chicken sandwich with cheese", "price": 13.9 },
-        { "id": "x-linguica", "pt": "X-Linguiça", "en": "Brazilian sausage sandwich with cheese", "price": 15.9 },
-        { "id": "x-picanha", "pt": "X-Picanha", "en": "Sliced picanha steak with cheese", "price": 15.9 },
-        { "id": "x-tudo", "pt": "X-Tudo", "en": "The everything burger: egg, bacon, ham, cheese, corn and more", "price": 15.9 }
+        {"id": "x-burguer", "pt": "X-Burguer", "en": "Beef burger with melted cheese", "price": 12.9},
+        {"id": "x-egg", "pt": "X-Egg", "en": "Cheeseburger topped with a fried egg", "price": 12.9},
+        {"id": "x-bacon", "pt": "X-Bacon", "en": "Cheeseburger loaded with crispy bacon", "price": 13.9},
+        {"id": "x-frango", "pt": "X-Frango", "en": "Grilled chicken sandwich with cheese", "price": 13.9},
+        {"id": "x-linguica", "pt": "X-Linguiça", "en": "Brazilian sausage sandwich with cheese", "price": 15.9},
+        {"id": "x-picanha", "pt": "X-Picanha", "en": "Sliced picanha steak with cheese", "price": 15.9},
+        {"id": "x-tudo", "pt": "X-Tudo", "en": "The everything burger: egg, bacon, ham, cheese, corn and more", "price": 15.9}
       ]
     },
     {
@@ -45,30 +45,30 @@
       "pt": "Pratos",
       "noteKey": "menu.note.pratos",
       "items": [
-        { "id": "picanha", "pt": "Picanha", "en": "Grilled top sirloin cap, the Brazilian steakhouse cut", "price": 17.99, "weekday": true },
-        { "id": "frango", "pt": "Frango Grelhado ou à Milanesa", "en": "Chicken breast, grilled or breaded and fried", "price": 14.99, "weekday": true },
-        { "id": "linguica-toscana", "pt": "Linguiça Toscana", "en": "Grilled Tuscan-style pork sausage", "price": 15.99, "weekday": true },
-        { "id": "feijoada", "pt": "Feijoada", "en": "Black bean and pork stew, Brazil's Saturday feast. Once a month", "price": null, "monthly": true }
+        {"id": "picanha", "pt": "Picanha", "en": "Grilled top sirloin cap, the Brazilian steakhouse cut", "price": 17.99, "weekday": true},
+        {"id": "frango", "pt": "Frango Grelhado ou à Milanesa", "en": "Chicken breast, grilled or breaded and fried", "price": 14.99, "weekday": true},
+        {"id": "linguica-toscana", "pt": "Linguiça Toscana", "en": "Grilled Tuscan-style pork sausage", "price": 15.99, "weekday": true},
+        {"id": "feijoada", "pt": "Feijoada", "en": "Black bean and pork stew with rice, collards, farofa and orange. Brazil's Saturday feast", "price": 18.99, "monthly": true, "unitKey": "menu.unit.plate"}
       ]
     },
     {
       "id": "doces",
       "pt": "Doces",
       "items": [
-        { "id": "brigadeiro", "pt": "Brigadeiro", "en": "Fudgy chocolate truffle rolled in sprinkles", "price": 2.25, "popular": true },
-        { "id": "coxinha-de-brigadeiro", "pt": "Coxinha de Brigadeiro", "en": "Strawberry wrapped in brigadeiro, shaped like a coxinha", "price": null },
-        { "id": "bolo-caseiro", "pt": "Bolo Caseiro", "en": "Homestyle cake slice, like grandma's", "price": 4.0, "unitKey": "menu.unit.slice" },
-        { "id": "bolo-recheado", "pt": "Bolo Recheado", "en": "Layered cake slice with a creamy filling", "price": 6.0, "unitKey": "menu.unit.slice" },
-        { "id": "bolo-de-pote", "pt": "Bolo de Pote", "en": "Cake layered in a cup with cream and filling", "price": 5.25 },
-        { "id": "pudim", "pt": "Pudim", "en": "Silky Brazilian flan with caramel", "price": 5.0 },
-        { "id": "mousse", "pt": "Mousse", "en": "Light, airy mousse (ask for today's flavor)", "price": 5.0 }
+        {"id": "brigadeiro", "pt": "Brigadeiro", "en": "Fudgy chocolate truffle rolled in sprinkles", "price": 2.25, "popular": true},
+        {"id": "coxinha-de-brigadeiro", "pt": "Coxinha de Brigadeiro", "en": "Strawberry wrapped in brigadeiro, shaped like a coxinha", "price": 3.5},
+        {"id": "bolo-caseiro", "pt": "Bolo Caseiro", "en": "Homestyle cake slice, like grandma's", "price": 4.0, "unitKey": "menu.unit.slice"},
+        {"id": "bolo-recheado", "pt": "Bolo Recheado", "en": "Layered cake slice with a creamy filling", "price": 6.0, "unitKey": "menu.unit.slice"},
+        {"id": "bolo-de-pote", "pt": "Bolo de Pote", "en": "Cake layered in a cup with cream and filling", "price": 5.25},
+        {"id": "pudim", "pt": "Pudim", "en": "Silky Brazilian flan with caramel", "price": 5.0},
+        {"id": "mousse", "pt": "Mousse", "en": "Light, airy mousse (ask for today's flavor)", "price": 5.0}
       ]
     },
     {
       "id": "acai",
       "pt": "Açaí",
       "items": [
-        { "id": "acai", "pt": "Açaí", "en": "Frozen açaí bowl with your toppings. Small or large", "price": null }
+        {"id": "acai", "pt": "Açaí", "en": "Frozen açaí bowl with granola, banana and your toppings. Large $11.99", "price": 8.99, "unitKey": "menu.unit.small"}
       ]
     }
   ]
